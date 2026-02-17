@@ -41,7 +41,7 @@ function renderParagraphs(paragraphs) {
 
 function splitText() {
   const lines = inputText.value.split(/\r?\n/);
-  const paragraphs = chunkLines(lines, 6);
+  const paragraphs = chunkLines(lines, 5);
   renderParagraphs(paragraphs);
 }
 
