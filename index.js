@@ -15,9 +15,12 @@ const formatRupiahInput = (value) =>
   value ? `Rp ${new Intl.NumberFormat("id-ID").format(value)}` : "";
 
 const formatIDR = (value) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(
-    value
-  );
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(value);
 
 const formatNumber = (value) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
