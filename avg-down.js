@@ -4,7 +4,7 @@ const state = {
   history: [],
 };
 
-const HISTORY_KEY = "stock_trade_history_v1";
+const HISTORY_KEY = "stock_avg_down_history_v1";
 
 const parseIDR = (value) => {
   const numeric = String(value || "").replace(/[^0-9]/g, "");
@@ -29,52 +29,48 @@ const readNumber = (id, formatted = false) => {
   return Number.isFinite(num) ? num : 0;
 };
 
-const calcTrade = () => {
-  const buyPrice = readNumber("buyPrice", true);
-  const sellPrice = readNumber("sellPrice", true);
-  const lot = readNumber("lot");
-  const buyFeePct = readNumber("buyFee");
-  const sellFeePct = readNumber("sellFee");
+const calcAverageDown = () => {
+  const initialPrice = readNumber("initialPrice", true);
+  const initialLot = readNumber("initialLot");
+  const initialFee = readNumber("initialFee", true);
+  const nextPrice = readNumber("nextPrice", true);
+  const nextLot = readNumber("nextLot");
+  const nextFee = readNumber("nextFee", true);
 
-  const shares = lot * 100;
-  const grossBuy = buyPrice * shares;
-  const grossSell = sellPrice * shares;
-  const buyFee = (buyFeePct / 100) * grossBuy;
-  const sellFee = (sellFeePct / 100) * grossSell;
-  const totalBuy = grossBuy + buyFee;
-  const totalSell = grossSell - sellFee;
-  const profit = totalSell - totalBuy;
-  const profitPct = totalBuy > 0 ? (profit / totalBuy) * 100 : 0;
+  const initialShares = initialLot * 100;
+  const nextShares = nextLot * 100;
+
+  const initialCost = initialFee;
+  const nextCost = nextFee;
+
+  const totalCost = initialCost + nextCost;
+  const totalShares = initialShares + nextShares;
+  const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
 
   return {
-    buyPrice,
-    sellPrice,
-    lot,
-    buyFeePct,
-    sellFeePct,
-    shares,
-    totalBuy,
-    totalSell,
-    profit,
-    profitPct,
+    initialPrice,
+    initialLot,
+    initialFee,
+    nextPrice,
+    nextLot,
+    nextFee,
+    totalCost,
+    totalShares,
+    totalLot: totalShares / 100,
+    avgPrice,
   };
 };
 
 const renderResult = (data) => {
   const resultBox = el("resultBox");
-  resultBox.classList.remove("profit", "loss");
-  if (!data.totalBuy && !data.totalSell) {
+  if (!data.totalCost || !data.totalShares) {
     resultBox.textContent = "Isi data lalu perhitungan akan otomatis muncul.";
     return;
   }
-  if (data.profit > 0) resultBox.classList.add("profit");
-  if (data.profit < 0) resultBox.classList.add("loss");
   resultBox.innerHTML = `
-    <div><strong>Total beli:</strong> ${formatIDR(data.totalBuy)}</div>
-    <div><strong>Total jual:</strong> ${formatIDR(data.totalSell)}</div>
-    <div><strong>Untung/Rugi:</strong> ${formatIDR(data.profit)} (${formatNumber(
-      data.profitPct
-    )}%)</div>
+    <div><strong>Average harga:</strong> ${formatNumber(data.avgPrice)}</div>
+    <div><strong>Jumlah lot:</strong> ${formatNumber(data.totalLot)}</div>
+    <div><strong>Total biaya:</strong> ${formatIDR(data.totalCost)}</div>
   `;
 };
 
@@ -88,6 +84,21 @@ const setupRupiahInput = (id) => {
     const num = parseIDR(input.value);
     input.value = num ? formatRupiahInput(num) : "";
   });
+  input.addEventListener("input", () => {
+    if (!input.value) input.dataset.manual = "0";
+  });
+};
+
+const autoFillCost = (priceId, lotId, feeId) => {
+  const feeInput = el(feeId);
+  if (feeInput.dataset.manual === "1") return;
+  const price = readNumber(priceId, true);
+  const lot = readNumber(lotId);
+  if (price > 0 && lot > 0) {
+    feeInput.value = formatRupiahInput(price * lot * 100);
+  } else {
+    feeInput.value = "";
+  }
 };
 
 const loadHistory = () => {
@@ -118,14 +129,19 @@ const renderHistory = () => {
     const div = document.createElement("div");
     div.className = "history-item";
     div.innerHTML = `
-      <div><strong>Harga beli:</strong> ${formatNumber(item.buyPrice)}</div>
-      <div><strong>Harga jual:</strong> ${formatNumber(item.sellPrice)}</div>
-      <div><strong>Lot:</strong> ${formatNumber(item.lot)}</div>
-      <div><strong>Total beli:</strong> ${formatIDR(item.totalBuy)}</div>
-      <div><strong>Total jual:</strong> ${formatIDR(item.totalSell)}</div>
-      <div><strong>Untung/Rugi:</strong> ${formatIDR(
-        item.profit
-      )} (${formatNumber(item.profitPct)}%)</div>
+      <div><strong>Pembelian awal:</strong> ${formatNumber(
+        item.initialPrice
+      )} | Lot ${formatNumber(item.initialLot)} | Biaya ${formatIDR(
+      item.initialFee
+    )}</div>
+      <div><strong>Pembelian berikutnya:</strong> ${formatNumber(
+        item.nextPrice
+      )} | Lot ${formatNumber(item.nextLot)} | Biaya ${formatIDR(
+      item.nextFee
+    )}</div>
+      <div><strong>Average harga:</strong> ${formatNumber(item.avgPrice)}</div>
+      <div><strong>Jumlah lot:</strong> ${formatNumber(item.totalLot)}</div>
+      <div><strong>Total biaya:</strong> ${formatIDR(item.totalCost)}</div>
     `;
     list.appendChild(div);
   });
@@ -136,14 +152,15 @@ const copyHistory = async () => {
   const lines = state.history.map((item, idx) => {
     return [
       `#${idx + 1}`,
-      `Harga beli: ${formatNumber(item.buyPrice)}`,
-      `Harga jual: ${formatNumber(item.sellPrice)}`,
-      `Lot: ${formatNumber(item.lot)}`,
-      `Total beli: ${formatIDR(item.totalBuy)}`,
-      `Total jual: ${formatIDR(item.totalSell)}`,
-      `Untung/Rugi: ${formatIDR(item.profit)} (${formatNumber(
-        item.profitPct
-      )}%)`,
+      `Awal: ${formatNumber(item.initialPrice)} | Lot ${formatNumber(
+        item.initialLot
+      )} | Biaya ${formatIDR(item.initialFee)}`,
+      `Next: ${formatNumber(item.nextPrice)} | Lot ${formatNumber(
+        item.nextLot
+      )} | Biaya ${formatIDR(item.nextFee)}`,
+      `Average: ${formatNumber(item.avgPrice)}`,
+      `Total lot: ${formatNumber(item.totalLot)}`,
+      `Total biaya: ${formatIDR(item.totalCost)}`,
     ].join(" | ");
   });
   const text = lines.join("\n");
@@ -174,23 +191,37 @@ const init = () => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
   });
 
-  setupRupiahInput("buyPrice");
-  setupRupiahInput("sellPrice");
+  setupRupiahInput("initialPrice");
+  setupRupiahInput("nextPrice");
+  setupRupiahInput("initialFee");
+  setupRupiahInput("nextFee");
+
+  el("initialFee").addEventListener("input", () => {
+    el("initialFee").dataset.manual = "1";
+  });
+  el("nextFee").addEventListener("input", () => {
+    el("nextFee").dataset.manual = "1";
+  });
 
   const autoInputs = [
-    "buyPrice",
-    "sellPrice",
-    "lot",
-    "buyFee",
-    "sellFee",
+    "initialPrice",
+    "initialLot",
+    "initialFee",
+    "nextPrice",
+    "nextLot",
+    "nextFee",
   ];
   autoInputs.forEach((id) => {
-    el(id).addEventListener("input", () => renderResult(calcTrade()));
-    el(id).addEventListener("blur", () => renderResult(calcTrade()));
+    el(id).addEventListener("input", () => {
+      autoFillCost("initialPrice", "initialLot", "initialFee");
+      autoFillCost("nextPrice", "nextLot", "nextFee");
+      renderResult(calcAverageDown());
+    });
+    el(id).addEventListener("blur", () => renderResult(calcAverageDown()));
   });
 
   el("addHistoryBtn").addEventListener("click", () => {
-    const data = calcTrade();
+    const data = calcAverageDown();
     renderResult(data);
     state.history.unshift({
       ...data,
@@ -208,7 +239,7 @@ const init = () => {
   });
 
   el("copyHistoryBtn").addEventListener("click", copyHistory);
-  renderResult(calcTrade());
+  renderResult(calcAverageDown());
 };
 
 init();

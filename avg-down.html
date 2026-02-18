@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kalkulator Average Down Saham</title>
+    <style>
+      :root {
+        --bg: #f3f0ea;
+        --panel: #ffffff;
+        --ink: #1d1b1a;
+        --muted: #6c6a67;
+        --accent: #2b6cb0;
+        --accent-2: #b04a2b;
+        --border: #e0dcd5;
+      }
+      .nav {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+      .nav a {
+        text-decoration: none;
+        color: var(--ink);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+      .nav a.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Arial", "Helvetica", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(800px 500px at 5% 0%, #e8f0ff 0%, transparent 60%),
+          radial-gradient(700px 450px at 95% 10%, #f8e9df 0%, transparent 55%),
+          var(--bg);
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 32px auto 56px;
+        padding: 0 20px;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      h1 { margin: 0; font-size: 28px; }
+      .sub { color: var(--muted); font-size: 14px; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      }
+      .tabs {
+        display: inline-flex;
+        gap: 8px;
+        background: #f1eee8;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px;
+      }
+      .tab {
+        border: 0;
+        background: transparent;
+        padding: 8px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .tab.active { background: var(--accent); color: #fff; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 18px;
+        margin-top: 18px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px 18px;
+        margin-top: 18px;
+      }
+      .section-title {
+        margin-top: 18px;
+        font-size: 16px;
+      }
+      label {
+        font-size: 13px;
+        color: var(--muted);
+        display: block;
+        margin-bottom: 6px;
+      }
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 15px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn.secondary { background: var(--accent-2); }
+      .result {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        background: #f6f6f1;
+        border: 1px dashed var(--border);
+        font-size: 15px;
+      }
+      .history {
+        margin-top: 16px;
+        display: grid;
+        gap: 10px;
+      }
+      .history-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+        font-size: 14px;
+      }
+      .muted { color: var(--muted); }
+      @media (max-width: 720px) {
+        .grid { grid-template-columns: 1fr; }
+        .grid-3 { grid-template-columns: 1fr; }
+        header { flex-direction: column; align-items: flex-start; }
+      }
+      footer {
+        margin-top: 24px;
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Kalkulator Average Down</h1>
+        <div class="sub">Hitung harga rata-rata setelah pembelian tambahan.</div>
+      </header>
+      <nav class="nav">
+        <a href="index.html">Jual Beli</a>
+        <a class="active" href="avg-down.html">Average Down</a>
+      </nav>
+
+      <div class="panel" style="margin-top: 18px;">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
+          <button class="tab" data-tab="history" type="button">History</button>
+        </div>
+
+        <section id="tab-calc" style="margin-top: 16px;">
+          <div class="section-title"><strong>Pembelian awal</strong></div>
+          <div class="grid-3">
+            <div>
+              <label for="initialPrice">Harga beli</label>
+              <input id="initialPrice" type="text" inputmode="numeric" placeholder="contoh: 1500" />
+            </div>
+            <div>
+              <label for="initialLot">Lot</label>
+              <input id="initialLot" type="number" min="0" step="1" placeholder="contoh: 10" />
+            </div>
+            <div>
+              <label for="initialFee">Biaya (Rp)</label>
+              <input id="initialFee" type="text" inputmode="numeric" placeholder="contoh: 1.500.000" />
+            </div>
+          </div>
+
+          <div class="section-title"><strong>Pembelian berikutnya</strong></div>
+          <div class="grid-3">
+            <div>
+              <label for="nextPrice">Harga beli</label>
+              <input id="nextPrice" type="text" inputmode="numeric" placeholder="contoh: 1300" />
+            </div>
+            <div>
+              <label for="nextLot">Lot</label>
+              <input id="nextLot" type="number" min="0" step="1" placeholder="contoh: 10" />
+            </div>
+            <div>
+              <label for="nextFee">Biaya (Rp)</label>
+              <input id="nextFee" type="text" inputmode="numeric" placeholder="contoh: 1.300.000" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 16px;">
+            <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
+            <span class="muted">Perhitungan otomatis • 1 lot = 100 saham</span>
+          </div>
+
+          <div class="result" id="resultBox">Isi data lalu klik Hitung.</div>
+        </section>
+
+        <section id="tab-history" style="display:none; margin-top: 16px;">
+          <div class="row">
+            <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
+            <button class="btn secondary" id="clearHistoryBtn" type="button">Clear</button>
+          </div>
+          <div class="history" id="historyList"></div>
+          <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
+        </section>
+      </div>
+      <footer>Copyright by Ferry Pratama</footer>
+    </div>
+
+    <script src="avg-down.js"></script>
+  </body>
+</html>
