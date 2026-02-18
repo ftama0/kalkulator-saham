@@ -115,9 +115,9 @@ const saveHistory = () => {
 };
 
 const renderHistory = () => {
-  const list = el("historyList");
   const empty = el("historyEmpty");
-  list.innerHTML = "";
+  const body = el("historyBody");
+  body.innerHTML = "";
 
   if (!state.history.length) {
     empty.style.display = "block";
@@ -125,25 +125,46 @@ const renderHistory = () => {
   }
 
   empty.style.display = "none";
-  state.history.forEach((item) => {
-    const div = document.createElement("div");
-    div.className = "history-item";
-    div.innerHTML = `
-      <div><strong>Pembelian awal:</strong> ${formatNumber(
-        item.initialPrice
-      )} | Lot ${formatNumber(item.initialLot)} | Biaya ${formatIDR(
-      item.initialFee
-    )}</div>
-      <div><strong>Pembelian berikutnya:</strong> ${formatNumber(
-        item.nextPrice
-      )} | Lot ${formatNumber(item.nextLot)} | Biaya ${formatIDR(
-      item.nextFee
-    )}</div>
-      <div><strong>Average harga:</strong> ${formatNumber(item.avgPrice)}</div>
-      <div><strong>Jumlah lot:</strong> ${formatNumber(item.totalLot)}</div>
-      <div><strong>Total biaya:</strong> ${formatIDR(item.totalCost)}</div>
+  state.history.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${
+        idx + 1
+      }</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">
+        ${formatNumber(item.initialPrice)} | Lot ${formatNumber(
+      item.initialLot
+    )} | ${formatIDR(item.initialFee)}
+      </td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">
+        ${formatNumber(item.nextPrice)} | Lot ${formatNumber(
+      item.nextLot
+    )} | ${formatIDR(item.nextFee)}
+      </td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+        item.avgPrice
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+        item.totalLot
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
+        item.totalCost
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">
+        <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
+      </td>
     `;
-    list.appendChild(div);
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll("[data-del-index]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const index = Number(btn.dataset.delIndex);
+      if (!Number.isFinite(index)) return;
+      state.history.splice(index, 1);
+      saveHistory();
+      renderHistory();
+    });
   });
 };
 

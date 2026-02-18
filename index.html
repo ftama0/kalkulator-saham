@@ -263,16 +263,32 @@
       </section>
 
       <section id="tab-history" style="display:none; margin-top: 16px;">
-        <div class="row">
-          <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
-          <button class="btn secondary" id="clearHistoryBtn" type="button">Clear</button>
-        </div>
-        <div class="history" id="historyList"></div>
-        <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
-      </section>
+          <div class="row">
+            <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
+            <button class="btn secondary" id="clearHistoryBtn" type="button">Hapus Semua</button>
+          </div>
+          <div class="history" id="historyList">
+            <table id="historyTable" style="width:100%; border-collapse: collapse; margin-top: 10px;">
+              <thead>
+                <tr>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">#</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Harga Beli</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Harga Jual</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Lot</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Total Beli</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Total Jual</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Untung/Rugi</th>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+          <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
+        </section>
+      </div>
+      <footer>Copyright by Ferry Pratama</footer>
     </div>
-    <footer>Copyright by Ferry Pratama</footer>
-  </div>
 
   <script src="index.js"></script>
 </body>

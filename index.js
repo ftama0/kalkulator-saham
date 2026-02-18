@@ -104,9 +104,9 @@ const saveHistory = () => {
 };
 
 const renderHistory = () => {
-  const list = el("historyList");
   const empty = el("historyEmpty");
-  list.innerHTML = "";
+  const body = el("historyBody");
+  body.innerHTML = "";
 
   if (!state.history.length) {
     empty.style.display = "block";
@@ -114,20 +114,45 @@ const renderHistory = () => {
   }
 
   empty.style.display = "none";
-  state.history.forEach((item) => {
-    const div = document.createElement("div");
-    div.className = "history-item";
-    div.innerHTML = `
-      <div><strong>Harga beli:</strong> ${formatNumber(item.buyPrice)}</div>
-      <div><strong>Harga jual:</strong> ${formatNumber(item.sellPrice)}</div>
-      <div><strong>Lot:</strong> ${formatNumber(item.lot)}</div>
-      <div><strong>Total beli:</strong> ${formatIDR(item.totalBuy)}</div>
-      <div><strong>Total jual:</strong> ${formatIDR(item.totalSell)}</div>
-      <div><strong>Untung/Rugi:</strong> ${formatIDR(
+  state.history.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${
+        idx + 1
+      }</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+        item.buyPrice
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+        item.sellPrice
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+        item.lot
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
+        item.totalBuy
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
+        item.totalSell
+      )}</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
         item.profit
-      )} (${formatNumber(item.profitPct)}%)</div>
+      )} (${formatNumber(item.profitPct)}%)</td>
+      <td style="padding:8px; border-bottom:1px solid var(--border);">
+        <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
+      </td>
     `;
-    list.appendChild(div);
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll("[data-del-index]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const index = Number(btn.dataset.delIndex);
+      if (!Number.isFinite(index)) return;
+      state.history.splice(index, 1);
+      saveHistory();
+      renderHistory();
+    });
   });
 };
 
