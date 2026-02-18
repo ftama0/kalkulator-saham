@@ -20,7 +20,7 @@ const formatIDR = (value) =>
   );
 
 const formatNumber = (value) =>
-  new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(value);
+  new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
 
 const readNumber = (id, formatted = false) => {
   const raw = el(id).value;
