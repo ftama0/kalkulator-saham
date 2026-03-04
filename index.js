@@ -12,12 +12,21 @@ const parseIDR = (value) => {
   let cleaned = raw.replace(/[^0-9,.\-]/g, "");
   const hasComma = cleaned.includes(",");
   const hasDot = cleaned.includes(".");
+  const isThousandDot = /^\-?\d{1,3}(\.\d{3})+$/;
+  const isThousandComma = /^\-?\d{1,3}(,\d{3})+$/;
   if (hasComma && hasDot) {
     // id-ID style: 1.234,56 -> 1234.56
     cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+  } else if (hasDot) {
+    // 1.234 -> 1234 (thousand separator), otherwise treat as decimal
+    cleaned = isThousandDot.test(cleaned)
+      ? cleaned.replace(/\./g, "")
+      : cleaned;
   } else if (hasComma) {
     // 1234,56 -> 1234.56
-    cleaned = cleaned.replace(",", ".");
+    cleaned = isThousandComma.test(cleaned)
+      ? cleaned.replace(/,/g, "")
+      : cleaned.replace(",", ".");
   }
   const parsed = Number.parseFloat(cleaned);
   return Number.isFinite(parsed) ? parsed : 0;
