@@ -179,7 +179,7 @@ const renderHistory = () => {
         item.profit
       )} (${formatNumber2(item.profitPct)}%)</td>
       <td style="padding:8px; border-bottom:1px solid var(--border);">
-        <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
+        <button class="btn danger" data-del-index="${idx}" type="button">Hapus</button>
       </td>
     `;
     body.appendChild(tr);

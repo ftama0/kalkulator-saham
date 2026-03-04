@@ -196,7 +196,7 @@ const renderHistory = () => {
         </div>
       </td>
       <td class="history-actions">
-        <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
+        <button class="btn danger" data-del-index="${idx}" type="button">Hapus</button>
       </td>
     `;
     body.appendChild(tr);
