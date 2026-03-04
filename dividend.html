@@ -3,23 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kalkulator Average Down Saham</title>
+    <title>Kalkulator Dividen Saham</title>
     <style>
       :root {
-        --bg: #f3f0ea;
+        --bg: #f5f1e8;
         --panel: #ffffff;
-        --ink: #1d1b1a;
-        --muted: #6c6a67;
-        --accent: #2b6cb0;
-        --accent-2: #b04a2b;
-        --border: #e0dcd5;
+        --ink: #1b1b1b;
+        --muted: #6b6b6b;
+        --accent: #1b7f6b;
+        --accent-2: #d8702c;
+        --border: #e2dfd7;
       }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "Arial", "Helvetica", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(900px 450px at 10% -20%, #f9efe0 0%, transparent 60%),
+          radial-gradient(700px 400px at 90% 0%, #e8f3ef 0%, transparent 55%),
+          var(--bg);
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 32px auto 56px;
+        padding: 0 20px;
+      }
+
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      h1 { margin: 0; font-size: 28px; letter-spacing: 0.5px; }
+      .sub { color: var(--muted); font-size: 14px; }
+
       .nav {
         display: flex;
         gap: 12px;
         margin-top: 12px;
         font-size: 14px;
       }
+
       .nav a {
         text-decoration: none;
         color: var(--ink);
@@ -28,55 +58,37 @@
         border: 1px solid var(--border);
         background: #fff;
       }
+
       .nav a.active {
         background: var(--accent);
         color: #fff;
         border-color: var(--accent);
       }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: "Arial", "Helvetica", sans-serif;
-        color: var(--ink);
-        background:
-          radial-gradient(800px 500px at 5% 0%, #e8f0ff 0%, transparent 60%),
-          radial-gradient(700px 450px at 95% 10%, #f8e9df 0%, transparent 55%),
-          var(--bg);
-      }
-      .wrap {
-        max-width: 980px;
-        margin: 32px auto 56px;
-        padding: 0 20px;
-      }
-      header {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 16px;
-      }
-      h1 { margin: 0; font-size: 28px; }
-      .sub { color: var(--muted); font-size: 14px; }
+
       .panel {
         background: var(--panel);
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 20px;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
       }
+
       .tabs-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
       }
+
       .tabs {
         display: inline-flex;
         gap: 8px;
-        background: #f1eee8;
+        background: #f4f0e7;
         border: 1px solid var(--border);
         border-radius: 999px;
         padding: 6px;
       }
+
       .tab {
         border: 0;
         background: transparent;
@@ -85,29 +97,51 @@
         cursor: pointer;
         font-size: 14px;
       }
+
       .tab.active { background: var(--accent); color: #fff; }
+
+      .tab-panel {
+        margin-top: 16px;
+        position: relative;
+      }
+
+      .mode-switch {
+        display: inline-flex;
+        gap: 6px;
+        background: #f7f3ea;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px;
+      }
+
+      .mode-btn {
+        border: 0;
+        background: transparent;
+        padding: 6px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .mode-btn.active {
+        background: var(--accent-2);
+        color: #fff;
+      }
+
       .grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px 18px;
         margin-top: 18px;
       }
-      .grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px 18px;
-        margin-top: 18px;
-      }
-      .section-title {
-        margin-top: 18px;
-        font-size: 16px;
-      }
+
       label {
         font-size: 13px;
         color: var(--muted);
         display: block;
         margin-bottom: 6px;
       }
+
       input {
         width: 100%;
         padding: 10px 12px;
@@ -115,12 +149,14 @@
         border-radius: 10px;
         font-size: 15px;
       }
+
       .row {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
         align-items: center;
       }
+
       .btn {
         border: 0;
         border-radius: 10px;
@@ -130,23 +166,24 @@
         cursor: pointer;
         font-size: 14px;
       }
+
       .btn.secondary { background: var(--accent-2); }
-      .tab-panel {
-        margin-top: 16px;
-      }
+
       .result {
         margin-top: 18px;
         padding: 16px;
         border-radius: 14px;
-        background: #f6f6f1;
+        background: #f8f6f1;
         border: 1px solid var(--border);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         font-size: 15px;
       }
+
       .result.empty {
         border-style: dashed;
         color: var(--muted);
       }
+
       .result-title {
         font-size: 11px;
         text-transform: uppercase;
@@ -154,11 +191,13 @@
         color: var(--muted);
         margin-bottom: 10px;
       }
+
       .result-grid {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
       }
+
       .result-row {
         flex: 1 1 0;
         min-width: 200px;
@@ -171,19 +210,16 @@
         border: 1px solid var(--border);
         border-radius: 10px;
       }
-      .result-row span {
-        color: var(--muted);
-        font-size: 13px;
-      }
-      .result-row strong {
-        font-size: 16px;
-        font-weight: 600;
-      }
+
+      .result-row span { color: var(--muted); font-size: 13px; }
+      .result-row strong { font-size: 16px; font-weight: 600; }
+
       .history {
         margin-top: 16px;
         display: grid;
         gap: 10px;
       }
+
       .history-table {
         width: 100%;
         border-collapse: separate;
@@ -191,6 +227,7 @@
         margin-top: 10px;
         font-size: 13px;
       }
+
       .history-table thead th {
         text-align: left;
         padding: 10px 12px;
@@ -201,46 +238,37 @@
         position: sticky;
         top: 0;
       }
+
       .history-table tbody td {
         padding: 10px 12px;
         border-bottom: 1px solid var(--border);
         vertical-align: top;
       }
-      .history-table tbody tr:nth-child(even) {
-        background: #fbfaf7;
-      }
-      .history-table tbody tr:hover {
-        background: #f3f1eb;
-      }
+
+      .history-table tbody tr:nth-child(even) { background: #fbfaf7; }
+      .history-table tbody tr:hover { background: #f3f1eb; }
+
       .history-cell {
         display: grid;
         gap: 4px;
         color: var(--ink);
       }
+
       .history-cell span {
         color: var(--muted);
         font-size: 12px;
       }
-      .history-actions {
-        white-space: nowrap;
-      }
-      .history-scroll {
-        overflow-x: auto;
-      }
-      .history-item {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-        background: #fff;
-        font-size: 14px;
-      }
+
+      .history-actions { white-space: nowrap; }
+      .history-scroll { overflow-x: auto; }
       .muted { color: var(--muted); }
+
       @media (max-width: 720px) {
         .grid { grid-template-columns: 1fr; }
-        .grid-3 { grid-template-columns: 1fr; }
         header { flex-direction: column; align-items: flex-start; }
         .tabs-row { flex-direction: column; align-items: stretch; }
       }
+
       footer {
         margin-top: 24px;
         font-size: 12px;
@@ -252,13 +280,13 @@
   <body>
     <div class="wrap">
       <header>
-        <h1>Kalkulator Average Down</h1>
-        <div class="sub">Hitung harga rata-rata setelah pembelian tambahan.</div>
+        <h1>Kalkulator Dividen</h1>
+        <div class="sub">Hitung estimasi dividen berdasarkan DPS atau yield.</div>
       </header>
       <nav class="nav">
         <a href="index.html">Jual Beli</a>
-        <a class="active" href="avg-down.html">Average Down</a>
-        <a href="dividend.html">Dividen</a>
+        <a href="avg-down.html">Average Down</a>
+        <a class="active" href="dividend.html">Dividen</a>
       </nav>
 
       <div class="panel" style="margin-top: 18px;">
@@ -271,35 +299,41 @@
         </div>
 
         <section id="tab-calc" class="tab-panel">
-          <div class="section-title"><strong>Pembelian awal</strong></div>
-          <div class="grid-3">
+          <div class="row">
+            <div class="mode-switch" role="tablist">
+              <button class="mode-btn active" data-mode="dps" type="button">Mode DPS</button>
+              <button class="mode-btn" data-mode="yield" type="button">Mode Yield</button>
+            </div>
+            <span class="muted">Pajak default 0%</span>
+          </div>
+
+          <div id="mode-dps" class="grid">
             <div>
-              <label for="initialPrice">Harga beli</label>
-              <input id="initialPrice" type="text" inputmode="numeric" placeholder="contoh: 1500" />
+              <label for="dps">Dividen per saham (DPS)</label>
+              <input id="dps" type="text" inputmode="decimal" placeholder="contoh: 25,5" />
             </div>
             <div>
-              <label for="initialLot">Lot</label>
-              <input id="initialLot" type="number" min="0" step="1" placeholder="contoh: 10" />
+              <label for="lot">Lot</label>
+              <input id="lot" type="number" min="0" step="1" placeholder="contoh: 10" />
             </div>
             <div>
-              <label for="initialFee">Biaya (Rp)</label>
-              <input id="initialFee" type="text" inputmode="numeric" placeholder="contoh: 1.500.000" />
+              <label for="taxDps">Pajak %</label>
+              <input id="taxDps" type="number" min="0" step="0.01" value="0" />
             </div>
           </div>
 
-          <div class="section-title"><strong>Pembelian berikutnya</strong></div>
-          <div class="grid-3">
+          <div id="mode-yield" class="grid" style="display:none;">
             <div>
-              <label for="nextPrice">Harga beli</label>
-              <input id="nextPrice" type="text" inputmode="numeric" placeholder="contoh: 1300" />
+              <label for="investment">Nilai investasi</label>
+              <input id="investment" type="text" inputmode="decimal" placeholder="contoh: 25.000.000" />
             </div>
             <div>
-              <label for="nextLot">Lot</label>
-              <input id="nextLot" type="number" min="0" step="1" placeholder="contoh: 10" />
+              <label for="yieldPct">Dividend yield %</label>
+              <input id="yieldPct" type="number" min="0" step="0.01" placeholder="contoh: 6.5" />
             </div>
             <div>
-              <label for="nextFee">Biaya (Rp)</label>
-              <input id="nextFee" type="text" inputmode="numeric" placeholder="contoh: 1.300.000" />
+              <label for="taxYield">Pajak %</label>
+              <input id="taxYield" type="number" min="0" step="0.01" value="0" />
             </div>
           </div>
 
@@ -318,19 +352,17 @@
           <div class="history" id="historyList">
             <div class="history-scroll">
               <table class="history-table" id="historyTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Pembelian Awal</th>
-                  <th>Pembelian Berikutnya</th>
-                  <th>Average Harga</th>
-                  <th>Jumlah Lot</th>
-                  <th>Total Biaya</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="historyBody"></tbody>
-            </table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Mode</th>
+                    <th>Input</th>
+                    <th>Hasil</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+              </table>
             </div>
           </div>
           <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
@@ -339,6 +371,6 @@
       <footer>Copyright by Ferry Pratama</footer>
     </div>
 
-    <script src="avg-down.js"></script>
+    <script src="dividend.js"></script>
   </body>
 </html>

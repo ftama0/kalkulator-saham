@@ -7,23 +7,46 @@ const state = {
 const HISTORY_KEY = "stock_trade_history_v1";
 
 const parseIDR = (value) => {
-  const numeric = String(value || "").replace(/[^0-9]/g, "");
-  return numeric ? Number(numeric) : 0;
+  const raw = String(value || "").trim();
+  if (!raw) return 0;
+  let cleaned = raw.replace(/[^0-9,.\-]/g, "");
+  const hasComma = cleaned.includes(",");
+  const hasDot = cleaned.includes(".");
+  if (hasComma && hasDot) {
+    // id-ID style: 1.234,56 -> 1234.56
+    cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+  } else if (hasComma) {
+    // 1234,56 -> 1234.56
+    cleaned = cleaned.replace(",", ".");
+  }
+  const parsed = Number.parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 const formatRupiahInput = (value) =>
-  value ? `Rp ${new Intl.NumberFormat("id-ID").format(value)}` : "";
+  value
+    ? `Rp ${new Intl.NumberFormat("id-ID", {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+      }).format(value)}`
+    : "";
 
 const formatIDR = (value) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   }).format(value);
 
-const formatNumber = (value) =>
+const formatNumber0 = (value) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
+
+const formatNumber2 = (value) =>
+  new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(value);
 
 const readNumber = (id, formatted = false) => {
   const raw = el(id).value;
@@ -65,19 +88,33 @@ const calcTrade = () => {
 
 const renderResult = (data) => {
   const resultBox = el("resultBox");
-  resultBox.classList.remove("profit", "loss");
+  resultBox.classList.remove("profit", "loss", "empty");
   if (!data.totalBuy && !data.totalSell) {
-    resultBox.textContent = "Isi data lalu perhitungan akan otomatis muncul.";
+    resultBox.classList.add("empty");
+    resultBox.innerHTML = `
+      <div class="result-title">Ringkasan</div>
+      <div>Isi data lalu perhitungan akan otomatis muncul.</div>
+    `;
     return;
   }
   if (data.profit > 0) resultBox.classList.add("profit");
   if (data.profit < 0) resultBox.classList.add("loss");
   resultBox.innerHTML = `
-    <div><strong>Total beli:</strong> ${formatIDR(data.totalBuy)}</div>
-    <div><strong>Total jual:</strong> ${formatIDR(data.totalSell)}</div>
-    <div><strong>Untung/Rugi:</strong> ${formatIDR(data.profit)} (${formatNumber(
-      data.profitPct
-    )}%)</div>
+    <div class="result-title">Ringkasan</div>
+    <div class="result-grid">
+      <div class="result-row">
+        <span>Total beli</span>
+        <strong>${formatIDR(data.totalBuy)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Total jual</span>
+        <strong>${formatIDR(data.totalSell)}</strong>
+      </div>
+    <div class="result-row">
+      <span>Hasil (${formatNumber2(data.profitPct)}%)</span>
+      <strong>${formatIDR(data.profit)}</strong>
+    </div>
+    </div>
   `;
 };
 
@@ -123,13 +160,13 @@ const renderHistory = () => {
       <td style="padding:8px; border-bottom:1px solid var(--border);">${
         idx + 1
       }</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber2(
         item.buyPrice
       )}</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber2(
         item.sellPrice
       )}</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
+      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber0(
         item.lot
       )}</td>
       <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
@@ -140,7 +177,7 @@ const renderHistory = () => {
       )}</td>
       <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
         item.profit
-      )} (${formatNumber(item.profitPct)}%)</td>
+      )} (${formatNumber2(item.profitPct)}%)</td>
       <td style="padding:8px; border-bottom:1px solid var(--border);">
         <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
       </td>
@@ -164,12 +201,12 @@ const copyHistory = async () => {
   const lines = state.history.map((item, idx) => {
     return [
       `#${idx + 1}`,
-      `Harga beli: ${formatNumber(item.buyPrice)}`,
-      `Harga jual: ${formatNumber(item.sellPrice)}`,
-      `Lot: ${formatNumber(item.lot)}`,
+      `Harga beli: ${formatNumber2(item.buyPrice)}`,
+      `Harga jual: ${formatNumber2(item.sellPrice)}`,
+      `Lot: ${formatNumber0(item.lot)}`,
       `Total beli: ${formatIDR(item.totalBuy)}`,
       `Total jual: ${formatIDR(item.totalSell)}`,
-      `Untung/Rugi: ${formatIDR(item.profit)} (${formatNumber(
+      `Untung/Rugi: ${formatIDR(item.profit)} (${formatNumber2(
         item.profitPct
       )}%)`,
     ].join(" | ");

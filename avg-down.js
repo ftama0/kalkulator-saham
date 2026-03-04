@@ -66,14 +66,31 @@ const calcAverageDown = () => {
 
 const renderResult = (data) => {
   const resultBox = el("resultBox");
+  resultBox.classList.remove("empty");
   if (!data.totalCost || !data.totalShares) {
-    resultBox.textContent = "Isi data lalu perhitungan akan otomatis muncul.";
+    resultBox.classList.add("empty");
+    resultBox.innerHTML = `
+      <div class="result-title">Ringkasan</div>
+      <div>Isi data lalu perhitungan akan otomatis muncul.</div>
+    `;
     return;
   }
   resultBox.innerHTML = `
-    <div><strong>Average harga:</strong> ${formatNumber(data.avgPrice)}</div>
-    <div><strong>Jumlah lot:</strong> ${formatNumber(data.totalLot)}</div>
-    <div><strong>Total biaya:</strong> ${formatIDR(data.totalCost)}</div>
+    <div class="result-title">Ringkasan</div>
+    <div class="result-grid">
+      <div class="result-row">
+        <span>Average harga</span>
+        <strong>${formatNumber(data.avgPrice)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Jumlah lot</span>
+        <strong>${formatNumber(data.totalLot)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Total biaya</span>
+        <strong>${formatIDR(data.totalCost)}</strong>
+      </div>
+    </div>
   `;
 };
 
@@ -131,29 +148,25 @@ const renderHistory = () => {
   state.history.forEach((item, idx) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${
-        idx + 1
-      }</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">
-        ${formatNumber(item.initialPrice)} | Lot ${formatNumber(
-      item.initialLot
-    )} | ${formatIDR(item.initialFee)}
+      <td>${idx + 1}</td>
+      <td>
+        <div class="history-cell">
+          <strong>${formatNumber(item.initialPrice)}</strong>
+          <span>Lot ${formatNumber(item.initialLot)}</span>
+          <span>${formatIDR(item.initialFee)}</span>
+        </div>
       </td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">
-        ${formatNumber(item.nextPrice)} | Lot ${formatNumber(
-      item.nextLot
-    )} | ${formatIDR(item.nextFee)}
+      <td>
+        <div class="history-cell">
+          <strong>${formatNumber(item.nextPrice)}</strong>
+          <span>Lot ${formatNumber(item.nextLot)}</span>
+          <span>${formatIDR(item.nextFee)}</span>
+        </div>
       </td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
-        item.avgPrice
-      )}</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatNumber(
-        item.totalLot
-      )}</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">${formatIDR(
-        item.totalCost
-      )}</td>
-      <td style="padding:8px; border-bottom:1px solid var(--border);">
+      <td><strong>${formatNumber(item.avgPrice)}</strong></td>
+      <td>${formatNumber(item.totalLot)}</td>
+      <td><strong>${formatIDR(item.totalCost)}</strong></td>
+      <td class="history-actions">
         <button class="btn secondary" data-del-index="${idx}" type="button">Hapus</button>
       </td>
     `;

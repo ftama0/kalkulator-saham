@@ -84,6 +84,13 @@
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
     }
 
+    .tabs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
     .tabs {
       display: inline-flex;
       gap: 8px;
@@ -91,6 +98,11 @@
       border: 1px solid var(--border);
       border-radius: 999px;
       padding: 6px;
+    }
+
+    .tab-panel {
+      margin-top: 16px;
+      position: relative;
     }
 
     .tab {
@@ -162,21 +174,85 @@
       background: var(--accent-2);
     }
 
-      .result {
-        margin-top: 18px;
-        padding: 14px;
-        border-radius: 12px;
-        background: #f8f6f1;
-        border: 1px dashed var(--border);
-        font-size: 15px;
-      }
-      .result.profit { color: #18794e; }
-      .result.loss { color: #b42318; }
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #f8f6f1;
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+    }
+
+    .result.empty {
+      border-style: dashed;
+      color: var(--muted);
+    }
+
+    .result.profit {
+      border-color: #c8e6d7;
+      background: linear-gradient(135deg, #f2fbf6, #f7fbf5);
+    }
+
+    .result.loss {
+      border-color: #f2c9c7;
+      background: linear-gradient(135deg, #fff6f6, #fff9f6);
+    }
+
+    .result-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .result-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .result-row {
+      flex: 1 1 0;
+      min-width: 200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .result-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-row strong {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .result.profit .result-row:last-child strong {
+      color: #18794e;
+    }
+
+    .result.loss .result-row:last-child strong {
+      color: #b42318;
+    }
 
     .history {
       margin-top: 16px;
       display: grid;
       gap: 10px;
+    }
+
+    .history-actions {
+      justify-content: flex-end;
+      margin-top: -8px;
     }
 
     .history-item {
@@ -200,6 +276,11 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .tabs-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     footer {
@@ -220,40 +301,43 @@
     <nav class="nav">
       <a class="active" href="index.html">Jual Beli</a>
       <a href="avg-down.html">Average Down</a>
+      <a href="dividend.html">Dividen</a>
     </nav>
 
     <div class="panel" style="margin-top: 18px;">
-      <div class="tabs" role="tablist">
-        <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
-        <button class="tab" data-tab="history" type="button">History</button>
+      <div class="tabs-row">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
+          <button class="tab" data-tab="history" type="button">History</button>
+        </div>
+        <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
       </div>
 
-      <section id="tab-calc" style="margin-top: 16px;">
+      <section id="tab-calc" class="tab-panel">
         <div class="grid">
           <div>
             <label for="buyPrice">Harga beli</label>
-            <input id="buyPrice" type="text" inputmode="numeric" placeholder="contoh: 1500" />
+            <input id="buyPrice" type="text" inputmode="decimal" placeholder="contoh: 1500.25" />
           </div>
           <div>
             <label for="sellPrice">Harga jual</label>
-            <input id="sellPrice" type="text" inputmode="numeric" placeholder="contoh: 1750" />
+            <input id="sellPrice" type="text" inputmode="decimal" placeholder="contoh: 1750.25" />
           </div>
           <div class="center-field">
             <label for="lot">Lot</label>
             <input id="lot" type="number" min="0" step="1" placeholder="contoh: 10" />
           </div>
           <div>
-            <label for="buyFee">Komisi beli % (default 0.15)</label>
-            <input id="buyFee" type="number" min="0" step="0.01" value="0.15" />
+            <label for="buyFee">Komisi beli %</label>
+            <input id="buyFee" type="number" min="0" step="0.01" value="0" />
           </div>
           <div>
-            <label for="sellFee">Komisi jual % (default 0.25)</label>
-            <input id="sellFee" type="number" min="0" step="0.01" value="0.25" />
+            <label for="sellFee">Komisi jual %</label>
+            <input id="sellFee" type="number" min="0" step="0.01" value="0" />
           </div>
         </div>
 
         <div class="row" style="margin-top: 16px;">
-          <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
           <span class="muted">Perhitungan otomatis • 1 lot = 100 saham</span>
         </div>
 
@@ -262,8 +346,8 @@
         </div>
       </section>
 
-      <section id="tab-history" style="display:none; margin-top: 16px;">
-          <div class="row">
+      <section id="tab-history" class="tab-panel" style="display:none;">
+          <div class="row history-actions">
             <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
             <button class="btn secondary" id="clearHistoryBtn" type="button">Hapus Semua</button>
           </div>
