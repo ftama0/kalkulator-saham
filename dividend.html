@@ -1,377 +1,428 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kalkulator Dividen Saham</title>
-    <style>
-      :root {
-        --bg: #f5f1e8;
-        --panel: #ffffff;
-        --ink: #1b1b1b;
-        --muted: #6b6b6b;
-        --accent: #1b7f6b;
-        --accent-2: #d8702c;
-        --border: #e2dfd7;
-      }
 
-      * { box-sizing: border-box; }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator Dividen Saham</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --panel: #ffffff;
+      --ink: #1b1b1b;
+      --muted: #6b6b6b;
+      --accent: #1b7f6b;
+      --accent-2: #d8702c;
+      --border: #e2dfd7;
+    }
 
-      body {
-        margin: 0;
-        font-family: "Arial", "Helvetica", sans-serif;
-        color: var(--ink);
-        background:
-          radial-gradient(900px 450px at 10% -20%, #f9efe0 0%, transparent 60%),
-          radial-gradient(700px 400px at 90% 0%, #e8f3ef 0%, transparent 55%),
-          var(--bg);
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      .wrap {
-        max-width: 980px;
-        margin: 32px auto 56px;
-        padding: 0 20px;
+    body {
+      margin: 0;
+      font-family: "Arial", "Helvetica", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 450px at 10% -20%, #f9efe0 0%, transparent 60%),
+        radial-gradient(700px 400px at 90% 0%, #e8f3ef 0%, transparent 55%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 32px auto 56px;
+      padding: 0 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .nav a.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .tabs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 8px;
+      background: #f4f0e7;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px;
+    }
+
+    .tab {
+      border: 0;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .tab-panel {
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      gap: 6px;
+      background: #f7f3ea;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+    }
+
+    .mode-btn {
+      border: 0;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .mode-btn.active {
+      background: var(--accent-2);
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+      margin-top: 18px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn.secondary {
+      background: var(--accent-2);
+    }
+
+    .btn.danger {
+      background: #b42318;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #f8f6f1;
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+    }
+
+    .result.empty {
+      border-style: dashed;
+      color: var(--muted);
+    }
+
+    .result-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .result-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .result-row {
+      flex: 1 1 0;
+      min-width: 200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .result-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-row strong {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .history {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .history-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #f7f4ee;
+      color: var(--muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    .history-table tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .history-table tbody tr:nth-child(even) {
+      background: #fbfaf7;
+    }
+
+    .history-table tbody tr:hover {
+      background: #f3f1eb;
+    }
+
+    .history-cell {
+      display: grid;
+      gap: 4px;
+      color: var(--ink);
+    }
+
+    .history-cell span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .history-actions {
+      white-space: nowrap;
+    }
+
+    .history-scroll {
+      overflow-x: auto;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
 
       header {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 16px;
-      }
-
-      h1 { margin: 0; font-size: 28px; letter-spacing: 0.5px; }
-      .sub { color: var(--muted); font-size: 14px; }
-
-      .nav {
-        display: flex;
-        gap: 12px;
-        margin-top: 12px;
-        font-size: 14px;
-      }
-
-      .nav a {
-        text-decoration: none;
-        color: var(--ink);
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: #fff;
-      }
-
-      .nav a.active {
-        background: var(--accent);
-        color: #fff;
-        border-color: var(--accent);
-      }
-
-      .panel {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .tabs-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
+        flex-direction: column;
+        align-items: stretch;
       }
+    }
 
-      .tabs {
-        display: inline-flex;
-        gap: 8px;
-        background: #f4f0e7;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        padding: 6px;
-      }
+    footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
 
-      .tab {
-        border: 0;
-        background: transparent;
-        padding: 8px 14px;
-        border-radius: 999px;
-        cursor: pointer;
-        font-size: 14px;
-      }
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Kalkulator Dividen</h1>
+      <div class="sub">Hitung estimasi dividen berdasarkan DPS atau yield.</div>
+    </header>
+    <nav class="nav">
+      <a href="index.html">Jual Beli</a>
+      <a href="avg-down.html">Average Down</a>
+      <a class="active" href="dividend.html">Dividen</a>
+    </nav>
 
-      .tab.active { background: var(--accent); color: #fff; }
+    <div class="panel" style="margin-top: 18px;">
+      <div class="tabs-row">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
+          <button class="tab" data-tab="history" type="button">History</button>
+        </div>
+        <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
+      </div>
 
-      .tab-panel {
-        margin-top: 16px;
-        position: relative;
-      }
-
-      .mode-switch {
-        display: inline-flex;
-        gap: 6px;
-        background: #f7f3ea;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        padding: 4px;
-      }
-
-      .mode-btn {
-        border: 0;
-        background: transparent;
-        padding: 6px 12px;
-        border-radius: 999px;
-        cursor: pointer;
-        font-size: 13px;
-      }
-
-      .mode-btn.active {
-        background: var(--accent-2);
-        color: #fff;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px 18px;
-        margin-top: 18px;
-      }
-
-      label {
-        font-size: 13px;
-        color: var(--muted);
-        display: block;
-        margin-bottom: 6px;
-      }
-
-      input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        font-size: 15px;
-      }
-
-      .row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-
-      .btn {
-        border: 0;
-        border-radius: 10px;
-        padding: 10px 14px;
-        background: var(--accent);
-        color: #fff;
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      .btn.secondary { background: var(--accent-2); }
-      .btn.danger { background: #b42318; }
-
-      .result {
-        margin-top: 18px;
-        padding: 16px;
-        border-radius: 14px;
-        background: #f8f6f1;
-        border: 1px solid var(--border);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        font-size: 15px;
-      }
-
-      .result.empty {
-        border-style: dashed;
-        color: var(--muted);
-      }
-
-      .result-title {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        color: var(--muted);
-        margin-bottom: 10px;
-      }
-
-      .result-grid {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .result-row {
-        flex: 1 1 0;
-        min-width: 200px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-      }
-
-      .result-row span { color: var(--muted); font-size: 13px; }
-      .result-row strong { font-size: 16px; font-weight: 600; }
-
-      .history {
-        margin-top: 16px;
-        display: grid;
-        gap: 10px;
-      }
-
-      .history-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-top: 10px;
-        font-size: 13px;
-      }
-
-      .history-table thead th {
-        text-align: left;
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--border);
-        background: #f7f4ee;
-        color: var(--muted);
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-      }
-
-      .history-table tbody td {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: top;
-      }
-
-      .history-table tbody tr:nth-child(even) { background: #fbfaf7; }
-      .history-table tbody tr:hover { background: #f3f1eb; }
-
-      .history-cell {
-        display: grid;
-        gap: 4px;
-        color: var(--ink);
-      }
-
-      .history-cell span {
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .history-actions { white-space: nowrap; }
-      .history-scroll { overflow-x: auto; }
-      .muted { color: var(--muted); }
-
-      @media (max-width: 720px) {
-        .grid { grid-template-columns: 1fr; }
-        header { flex-direction: column; align-items: flex-start; }
-        .tabs-row { flex-direction: column; align-items: stretch; }
-      }
-
-      footer {
-        margin-top: 24px;
-        font-size: 12px;
-        color: var(--muted);
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <h1>Kalkulator Dividen</h1>
-        <div class="sub">Hitung estimasi dividen berdasarkan DPS atau yield.</div>
-      </header>
-      <nav class="nav">
-        <a href="index.html">Jual Beli</a>
-        <a href="avg-down.html">Average Down</a>
-        <a class="active" href="dividend.html">Dividen</a>
-      </nav>
-
-      <div class="panel" style="margin-top: 18px;">
-        <div class="tabs-row">
-          <div class="tabs" role="tablist">
-            <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
-            <button class="tab" data-tab="history" type="button">History</button>
+      <section id="tab-calc" class="tab-panel">
+        <div class="row">
+          <div class="mode-switch" role="tablist">
+            <button class="mode-btn active" data-mode="dps" type="button">Mode DPS</button>
+            <button class="mode-btn" data-mode="yield" type="button">Mode Yield</button>
           </div>
-          <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
+          <span class="muted">Pajak default 0%</span>
         </div>
 
-        <section id="tab-calc" class="tab-panel">
-          <div class="row">
-            <div class="mode-switch" role="tablist">
-              <button class="mode-btn active" data-mode="dps" type="button">Mode DPS</button>
-              <button class="mode-btn" data-mode="yield" type="button">Mode Yield</button>
-            </div>
-            <span class="muted">Pajak default 0%</span>
+        <div id="mode-dps" class="grid">
+          <div>
+            <label for="dps">Dividen per saham (DPS)</label>
+            <input id="dps" type="text" inputmode="decimal" placeholder=" 25,5" />
           </div>
+          <div>
+            <label for="lot">Lot</label>
+            <input id="lot" type="number" min="0" step="1" placeholder=" 10" />
+          </div>
+          <div>
+            <label for="taxDps">Pajak %</label>
+            <input id="taxDps" type="number" min="0" step="0.01" value="0" />
+          </div>
+        </div>
 
-          <div id="mode-dps" class="grid">
-            <div>
-              <label for="dps">Dividen per saham (DPS)</label>
-              <input id="dps" type="text" inputmode="decimal" placeholder="contoh: 25,5" />
-            </div>
-            <div>
-              <label for="lot">Lot</label>
-              <input id="lot" type="number" min="0" step="1" placeholder="contoh: 10" />
-            </div>
-            <div>
-              <label for="taxDps">Pajak %</label>
-              <input id="taxDps" type="number" min="0" step="0.01" value="0" />
-            </div>
+        <div id="mode-yield" class="grid" style="display:none;">
+          <div>
+            <label for="investment">Nilai investasi</label>
+            <input id="investment" type="text" inputmode="decimal" placeholder=" 25.000.000" />
           </div>
+          <div>
+            <label for="yieldPct">Dividend yield %</label>
+            <input id="yieldPct" type="number" min="0" step="0.01" placeholder=" 6.5" />
+          </div>
+          <div>
+            <label for="taxYield">Pajak %</label>
+            <input id="taxYield" type="number" min="0" step="0.01" value="0" />
+          </div>
+        </div>
 
-          <div id="mode-yield" class="grid" style="display:none;">
-            <div>
-              <label for="investment">Nilai investasi</label>
-              <input id="investment" type="text" inputmode="decimal" placeholder="contoh: 25.000.000" />
-            </div>
-            <div>
-              <label for="yieldPct">Dividend yield %</label>
-              <input id="yieldPct" type="number" min="0" step="0.01" placeholder="contoh: 6.5" />
-            </div>
-            <div>
-              <label for="taxYield">Pajak %</label>
-              <input id="taxYield" type="number" min="0" step="0.01" value="0" />
-            </div>
-          </div>
+        <div class="row" style="margin-top: 16px;">
+          <span class="muted">Perhitungan otomatis • 1 lot = 100 saham</span>
+        </div>
 
-          <div class="row" style="margin-top: 16px;">
-            <span class="muted">Perhitungan otomatis • 1 lot = 100 saham</span>
-          </div>
+        <div class="result" id="resultBox">Isi data lalu perhitungan akan otomatis muncul.</div>
+      </section>
 
-          <div class="result" id="resultBox">Isi data lalu perhitungan akan otomatis muncul.</div>
-        </section>
-
-        <section id="tab-history" class="tab-panel" style="display:none;">
-          <div class="row">
-            <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
-            <button class="btn danger" id="clearHistoryBtn" type="button">Hapus Semua</button>
+      <section id="tab-history" class="tab-panel" style="display:none;">
+        <div class="row">
+          <button class="btn" id="copyHistoryBtn" type="button">Copy</button>
+          <button class="btn danger" id="clearHistoryBtn" type="button">Hapus Semua</button>
+        </div>
+        <div class="history" id="historyList">
+          <div class="history-scroll">
+            <table class="history-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Mode</th>
+                  <th>Input</th>
+                  <th>Hasil</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
           </div>
-          <div class="history" id="historyList">
-            <div class="history-scroll">
-              <table class="history-table" id="historyTable">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Mode</th>
-                    <th>Input</th>
-                    <th>Hasil</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="historyBody"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
-        </section>
-      </div>
-      <footer>Copyright by Ferry Pratama</footer>
+        </div>
+        <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
+      </section>
     </div>
+    <footer>Copyright by Ferry Pratama</footer>
+  </div>
 
-    <script src="dividend.js"></script>
-  </body>
+  <script src="dividend.js"></script>
+</body>
+
 </html>
