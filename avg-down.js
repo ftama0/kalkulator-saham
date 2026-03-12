@@ -25,6 +25,15 @@ const formatIDR = (value) =>
 const formatNumber = (value) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
 
+const formatPercent = (value) =>
+  `${new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)}%`;
+
+const percentChange = (price, base) =>
+  base > 0 ? ((price - base) / base) * 100 : 0;
+
 const readNumber = (id, formatted = false) => {
   const raw = el(id).value;
   if (formatted) return parseIDR(raw);
@@ -49,6 +58,11 @@ const calcAverageDown = () => {
   const totalCost = initialCost + nextCost;
   const totalShares = initialShares + nextShares;
   const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
+  const initialAvg = initialShares > 0 ? initialCost / initialShares : 0;
+  const currentPrice = nextPrice;
+
+  const percentAvgOld = percentChange(currentPrice, initialAvg);
+  const percentAvgNew = percentChange(currentPrice, avgPrice);
 
   return {
     initialPrice,
@@ -61,6 +75,10 @@ const calcAverageDown = () => {
     totalShares,
     totalLot: totalShares / 100,
     avgPrice,
+    initialAvg,
+    currentPrice,
+    percentAvgOld,
+    percentAvgNew,
   };
 };
 
@@ -89,6 +107,16 @@ const renderResult = (data) => {
       <div class="result-row">
         <span>Total biaya</span>
         <strong>${formatIDR(data.totalCost)}</strong>
+      </div>
+    </div>
+    <div class="result-grid" style="margin-top: 5%;">
+      <div class="result-row">
+        <span>Avg lama (%)</span>
+        <strong>${formatPercent(data.percentAvgOld)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Avg baru (%)</span>
+        <strong>${formatPercent(data.percentAvgNew)}</strong>
       </div>
     </div>
   `;
@@ -164,6 +192,14 @@ const renderHistory = () => {
         </div>
       </td>
       <td><strong>${formatNumber(item.avgPrice)}</strong></td>
+      <td>
+        <div class="history-cell">
+          <strong>Avg lama</strong>
+          <span>${formatPercent(item.percentAvgOld)}</span>
+          <strong>Avg baru</strong>
+          <span>${formatPercent(item.percentAvgNew)}</span>
+        </div>
+      </td>
       <td>${formatNumber(item.totalLot)}</td>
       <td><strong>${formatIDR(item.totalCost)}</strong></td>
       <td class="history-actions">
@@ -196,6 +232,8 @@ const copyHistory = async () => {
         item.nextLot
       )} | Biaya ${formatIDR(item.nextFee)}`,
       `Average: ${formatNumber(item.avgPrice)}`,
+      `Avg lama (%): ${formatPercent(item.percentAvgOld)}`,
+      `Avg baru (%): ${formatPercent(item.percentAvgNew)}`,
       `Total lot: ${formatNumber(item.totalLot)}`,
       `Total biaya: ${formatIDR(item.totalCost)}`,
     ].join(" | ");
