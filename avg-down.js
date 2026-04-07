@@ -48,6 +48,7 @@ const calcAverageDown = () => {
   const nextPrice = readNumber("nextPrice", true);
   const nextLot = readNumber("nextLot");
   const nextFee = readNumber("nextFee", true);
+  const currentPrice = readNumber("currentPrice", true);
 
   const initialShares = initialLot * 100;
   const nextShares = nextLot * 100;
@@ -59,7 +60,6 @@ const calcAverageDown = () => {
   const totalShares = initialShares + nextShares;
   const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
   const initialAvg = initialShares > 0 ? initialCost / initialShares : 0;
-  const currentPrice = nextPrice;
 
   const percentAvgOld = percentChange(currentPrice, initialAvg);
   const percentAvgNew = percentChange(currentPrice, avgPrice);
@@ -110,6 +110,10 @@ const renderResult = (data) => {
       </div>
     </div>
     <div class="result-grid" style="margin-top: 5%;">
+      <div class="result-row">
+        <span>Current price</span>
+        <strong>${formatNumber(data.currentPrice)}</strong>
+      </div>
       <div class="result-row">
         <span>Avg lama (%)</span>
         <strong>${formatPercent(data.percentAvgOld)}</strong>
@@ -174,6 +178,7 @@ const renderHistory = () => {
 
   empty.style.display = "none";
   state.history.forEach((item, idx) => {
+    const currentPrice = Number(item.currentPrice) || 0;
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${idx + 1}</td>
@@ -191,6 +196,7 @@ const renderHistory = () => {
           <span>${formatIDR(item.nextFee)}</span>
         </div>
       </td>
+      <td><strong>${formatNumber(currentPrice)}</strong></td>
       <td><strong>${formatNumber(item.avgPrice)}</strong></td>
       <td>
         <div class="history-cell">
@@ -223,6 +229,7 @@ const renderHistory = () => {
 const copyHistory = async () => {
   if (!state.history.length) return;
   const lines = state.history.map((item, idx) => {
+    const currentPrice = Number(item.currentPrice) || 0;
     return [
       `#${idx + 1}`,
       `Awal: ${formatNumber(item.initialPrice)} | Lot ${formatNumber(
@@ -231,6 +238,7 @@ const copyHistory = async () => {
       `Next: ${formatNumber(item.nextPrice)} | Lot ${formatNumber(
         item.nextLot
       )} | Biaya ${formatIDR(item.nextFee)}`,
+      `Current price: ${formatNumber(currentPrice)}`,
       `Average: ${formatNumber(item.avgPrice)}`,
       `Avg lama (%): ${formatPercent(item.percentAvgOld)}`,
       `Avg baru (%): ${formatPercent(item.percentAvgNew)}`,
@@ -268,6 +276,7 @@ const init = () => {
 
   setupRupiahInput("initialPrice");
   setupRupiahInput("nextPrice");
+  setupRupiahInput("currentPrice");
   setupRupiahInput("initialFee");
   setupRupiahInput("nextFee");
 
@@ -285,6 +294,7 @@ const init = () => {
     "nextPrice",
     "nextLot",
     "nextFee",
+    "currentPrice",
   ];
   autoInputs.forEach((id) => {
     el(id).addEventListener("input", () => {
