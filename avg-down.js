@@ -11,6 +11,40 @@ const parseIDR = (value) => {
   return numeric ? Number(numeric) : 0;
 };
 
+const parsePriceInput = (value) => {
+  const cleaned = String(value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/rp/gi, "")
+    .replace(/[^0-9.,-]/g, "");
+
+  if (!cleaned) return 0;
+
+  const separators = cleaned.match(/[.,]/g) || [];
+  if (!separators.length) {
+    const numeric = Number(cleaned);
+    return Number.isFinite(numeric) ? numeric : 0;
+  }
+
+  const lastComma = cleaned.lastIndexOf(",");
+  const lastDot = cleaned.lastIndexOf(".");
+  const decimalIndex = Math.max(lastComma, lastDot);
+  const integerPart = cleaned.slice(0, decimalIndex).replace(/[.,]/g, "");
+  const fractionPart = cleaned.slice(decimalIndex + 1).replace(/[.,]/g, "");
+  const hasSingleSeparator = separators.length === 1;
+  const shouldTreatAsThousands =
+    hasSingleSeparator &&
+    fractionPart.length === 3 &&
+    integerPart.length > 0 &&
+    !cleaned.startsWith("0");
+
+  const normalized = shouldTreatAsThousands
+    ? `${integerPart}${fractionPart}`
+    : `${integerPart || "0"}.${fractionPart}`;
+  const numeric = Number(normalized);
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
 const formatRupiahInput = (value) =>
   value ? `Rp ${new Intl.NumberFormat("id-ID").format(value)}` : "";
 
@@ -21,6 +55,13 @@ const formatIDR = (value) =>
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   }).format(value);
+
+const formatPrice = (value) =>
+  new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 4,
+  }).format(value);
+
+const formatPriceInput = (value) => (value ? formatPrice(value) : "");
 
 const formatNumber = (value) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
@@ -41,14 +82,16 @@ const readNumber = (id, formatted = false) => {
   return Number.isFinite(num) ? num : 0;
 };
 
+const readPrice = (id) => parsePriceInput(el(id).value);
+
 const calcAverageDown = () => {
-  const initialPrice = readNumber("initialPrice", true);
+  const initialPrice = readPrice("initialPrice");
   const initialLot = readNumber("initialLot");
   const initialFee = readNumber("initialFee", true);
-  const nextPrice = readNumber("nextPrice", true);
+  const nextPrice = readPrice("nextPrice");
   const nextLot = readNumber("nextLot");
   const nextFee = readNumber("nextFee", true);
-  const currentPrice = readNumber("currentPrice", true);
+  const currentPrice = readPrice("currentPrice");
 
   const initialShares = initialLot * 100;
   const nextShares = nextLot * 100;
@@ -98,7 +141,7 @@ const renderResult = (data) => {
     <div class="result-grid">
       <div class="result-row">
         <span>Average harga</span>
-        <strong>${formatNumber(data.avgPrice)}</strong>
+        <strong>${formatPrice(data.avgPrice)}</strong>
       </div>
       <div class="result-row">
         <span>Jumlah lot</span>
@@ -112,7 +155,7 @@ const renderResult = (data) => {
     <div class="result-grid" style="margin-top: 5%;">
       <div class="result-row">
         <span>Current price</span>
-        <strong>${formatNumber(data.currentPrice)}</strong>
+        <strong>${formatPrice(data.currentPrice)}</strong>
       </div>
       <div class="result-row">
         <span>Avg lama (%)</span>
@@ -124,6 +167,18 @@ const renderResult = (data) => {
       </div>
     </div>
   `;
+};
+
+const setupPriceInput = (id) => {
+  const input = el(id);
+  input.addEventListener("focus", () => {
+    const num = parsePriceInput(input.value);
+    input.value = num ? String(num) : "";
+  });
+  input.addEventListener("blur", () => {
+    const num = parsePriceInput(input.value);
+    input.value = formatPriceInput(num);
+  });
 };
 
 const setupRupiahInput = (id) => {
@@ -144,7 +199,7 @@ const setupRupiahInput = (id) => {
 const autoFillCost = (priceId, lotId, feeId) => {
   const feeInput = el(feeId);
   if (feeInput.dataset.manual === "1") return;
-  const price = readNumber(priceId, true);
+  const price = readPrice(priceId);
   const lot = readNumber(lotId);
   if (price > 0 && lot > 0) {
     feeInput.value = formatRupiahInput(price * lot * 100);
@@ -184,20 +239,20 @@ const renderHistory = () => {
       <td>${idx + 1}</td>
       <td>
         <div class="history-cell">
-          <strong>${formatNumber(item.initialPrice)}</strong>
+          <strong>${formatPrice(item.initialPrice)}</strong>
           <span>Lot ${formatNumber(item.initialLot)}</span>
           <span>${formatIDR(item.initialFee)}</span>
         </div>
       </td>
       <td>
         <div class="history-cell">
-          <strong>${formatNumber(item.nextPrice)}</strong>
+          <strong>${formatPrice(item.nextPrice)}</strong>
           <span>Lot ${formatNumber(item.nextLot)}</span>
           <span>${formatIDR(item.nextFee)}</span>
         </div>
       </td>
-      <td><strong>${formatNumber(currentPrice)}</strong></td>
-      <td><strong>${formatNumber(item.avgPrice)}</strong></td>
+      <td><strong>${formatPrice(currentPrice)}</strong></td>
+      <td><strong>${formatPrice(item.avgPrice)}</strong></td>
       <td>
         <div class="history-cell">
           <strong>Avg lama</strong>
@@ -232,14 +287,14 @@ const copyHistory = async () => {
     const currentPrice = Number(item.currentPrice) || 0;
     return [
       `#${idx + 1}`,
-      `Awal: ${formatNumber(item.initialPrice)} | Lot ${formatNumber(
+      `Awal: ${formatPrice(item.initialPrice)} | Lot ${formatNumber(
         item.initialLot
       )} | Biaya ${formatIDR(item.initialFee)}`,
-      `Next: ${formatNumber(item.nextPrice)} | Lot ${formatNumber(
+      `Next: ${formatPrice(item.nextPrice)} | Lot ${formatNumber(
         item.nextLot
       )} | Biaya ${formatIDR(item.nextFee)}`,
-      `Current price: ${formatNumber(currentPrice)}`,
-      `Average: ${formatNumber(item.avgPrice)}`,
+      `Current price: ${formatPrice(currentPrice)}`,
+      `Average: ${formatPrice(item.avgPrice)}`,
       `Avg lama (%): ${formatPercent(item.percentAvgOld)}`,
       `Avg baru (%): ${formatPercent(item.percentAvgNew)}`,
       `Total lot: ${formatNumber(item.totalLot)}`,
@@ -274,9 +329,9 @@ const init = () => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
   });
 
-  setupRupiahInput("initialPrice");
-  setupRupiahInput("nextPrice");
-  setupRupiahInput("currentPrice");
+  setupPriceInput("initialPrice");
+  setupPriceInput("nextPrice");
+  setupPriceInput("currentPrice");
   setupRupiahInput("initialFee");
   setupRupiahInput("nextFee");
 
