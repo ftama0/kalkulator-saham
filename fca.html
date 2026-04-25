@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator FCA Saham</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --panel: #ffffff;
+      --ink: #1b1b1b;
+      --muted: #6b6b6b;
+      --accent: #1b7f6b;
+      --accent-2: #d8702c;
+      --border: #e2dfd7;
+      --buy: #15803d;
+      --buy-soft: #ecfdf3;
+      --hold: #d97706;
+      --hold-soft: #fff7ed;
+      --sell: #b42318;
+      --sell-soft: #fff5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Arial", "Helvetica", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 450px at 10% -20%, #f9efe0 0%, transparent 60%),
+        radial-gradient(700px 400px at 90% 0%, #e8f3ef 0%, transparent 55%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 32px auto 56px;
+      padding: 0 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .nav a.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .panel {
+      margin-top: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid rgba(27, 127, 107, 0.18);
+      border-color: var(--accent);
+    }
+
+    .position-mode {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fbfaf7;
+    }
+
+    .radio-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .radio-card input {
+      width: auto;
+      margin: 0;
+    }
+
+    .input-unit {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 78px;
+      gap: 8px;
+    }
+
+    .input-field.field-error input,
+    .input-field.field-error select {
+      border-color: var(--sell);
+      background: var(--sell-soft);
+    }
+
+    .input-field.optional label::after {
+      content: " optional";
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .field-hot label {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .field-hot input {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn-small {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .btn-danger {
+      background: var(--sell);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border: 1px solid #f2c9c7;
+      border-radius: 12px;
+      background: var(--sell-soft);
+      color: var(--sell);
+      font-size: 14px;
+    }
+
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #f8f6f1;
+    }
+
+    .result.buy {
+      border-color: #bbf7d0;
+      background: var(--buy-soft);
+    }
+
+    .result.hold {
+      border-color: #fed7aa;
+      background: var(--hold-soft);
+    }
+
+    .result.sell {
+      border-color: #f2c9c7;
+      background: var(--sell-soft);
+    }
+
+    .result-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .signal-board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .signal-card {
+      display: grid;
+      gap: 4px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .signal-card span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .signal-card strong {
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .signal-card small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .trend.up strong,
+    .trend.bid-up strong {
+      color: var(--buy);
+    }
+
+    .trend.down strong,
+    .trend.bid-down strong {
+      color: var(--sell);
+    }
+
+    .trend.offer-up strong {
+      color: var(--sell);
+    }
+
+    .trend.offer-down strong {
+      color: var(--buy);
+    }
+
+    .trend.flat strong {
+      color: var(--hold);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric,
+    .decision-card {
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .metric-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .metric-name {
+      display: grid;
+      gap: 2px;
+    }
+
+    .metric-name span,
+    .decision-card span {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .formula {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .meaning {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .metric strong,
+    .decision-card strong {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .decision-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .decision {
+      font-size: 20px;
+    }
+
+    .decision.buy {
+      color: var(--buy);
+    }
+
+    .decision.hold {
+      color: var(--hold);
+    }
+
+    .decision.sell {
+      color: var(--sell);
+    }
+
+    .warning {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid #f2c9c7;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--sell);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-align: center;
+      animation: blink 0.75s steps(2, start) infinite;
+    }
+
+    .early-warning {
+      animation: none;
+      background: var(--sell);
+      color: #fff;
+    }
+
+    .history-panel {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .history-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .history-scroll {
+      overflow-x: auto;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .history-table th {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .history-table tbody tr:hover {
+      background: #fbfaf7;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.buy {
+      background: var(--buy);
+    }
+
+    .badge.hold {
+      background: var(--hold);
+    }
+
+    .badge.sell,
+    .badge.warn {
+      background: var(--sell);
+    }
+
+    .badge.neutral {
+      background: var(--muted);
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .grid,
+      .signal-board,
+      .metrics,
+      .decision-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Kalkulator FCA</h1>
+      <div class="sub">Scoring IEP, bid, offer, dan aktivitas lot untuk keputusan FCA.</div>
+    </header>
+    <nav class="nav">
+      <a href="index.html">Jual Beli</a>
+      <a href="avg-down.html">Average Down</a>
+      <a href="dividend.html">Dividen</a>
+      <a href="ara-arb.html">ARA / ARB</a>
+      <a class="active" href="fca.html">FCA</a>
+    </nav>
+
+    <main class="panel">
+      <form id="fcaForm" novalidate>
+        <div class="position-mode" role="radiogroup" aria-label="Position mode">
+          <label class="radio-card">
+            <input id="hasPosition" type="radio" name="positionMode" value="hasPosition" />
+            I already have position
+          </label>
+          <label class="radio-card">
+            <input id="noPosition" type="radio" name="positionMode" value="noPosition" checked />
+            I do not have position
+          </label>
+        </div>
+
+        <div class="grid">
+          <div class="input-field" data-field="iep">
+            <label for="iep">IEP</label>
+            <input id="iep" type="text" inputmode="decimal" placeholder="1500" />
+          </div>
+          <div class="input-field" data-field="lastPrice">
+            <label for="lastPrice">Last Price</label>
+            <input id="lastPrice" type="text" inputmode="decimal" placeholder="1450" />
+          </div>
+          <div class="input-field" data-field="iev">
+            <label for="iev">IEV</label>
+            <div class="input-unit">
+              <input id="iev" type="text" inputmode="decimal" placeholder="100" />
+              <select id="ievUnit" aria-label="IEV unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field field-hot" data-field="bidNow">
+            <label for="bidNow">Bid_now</label>
+            <div class="input-unit">
+              <input id="bidNow" type="text" inputmode="decimal" placeholder="70" />
+              <select id="bidNowUnit" aria-label="Bid_now unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field" data-field="bidPrev">
+            <label for="bidPrev">Bid_prev</label>
+            <div class="input-unit">
+              <input id="bidPrev" type="text" inputmode="decimal" placeholder="90" />
+              <select id="bidPrevUnit" aria-label="Bid_prev unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field field-hot" data-field="offerNow">
+            <label for="offerNow">Offer_now</label>
+            <div class="input-unit">
+              <input id="offerNow" type="text" inputmode="decimal" placeholder="30" />
+              <select id="offerNowUnit" aria-label="Offer_now unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field" data-field="offerPrev">
+            <label for="offerPrev">Offer_prev</label>
+            <div class="input-unit">
+              <input id="offerPrev" type="text" inputmode="decimal" placeholder="25" />
+              <select id="offerPrevUnit" aria-label="Offer_prev unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field" data-field="lotToday">
+            <label for="lotToday">Lot_today</label>
+            <div class="input-unit">
+              <input id="lotToday" type="text" inputmode="decimal" placeholder="12" />
+              <select id="lotTodayUnit" aria-label="Lot_today unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field" data-field="lotAvg">
+            <label for="lotAvg">Lot_avg</label>
+            <div class="input-unit">
+              <input id="lotAvg" type="text" inputmode="decimal" placeholder="10" />
+              <select id="lotAvgUnit" aria-label="Lot_avg unit">
+                <option value="">Unit</option>
+                <option value="K">K</option>
+                <option value="M">M</option>
+                <option value="B">B</option>
+                <option value="T">T</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn" type="submit">Calculate</button>
+          <span class="muted">Gunakan unit K/M/B/T untuk input cepat. Angka otomatis diformat dengan koma.</span>
+        </div>
+      </form>
+
+      <div class="error" id="errorBox"></div>
+
+      <section class="result" id="resultBox" aria-live="polite">
+        <div class="result-title">Hasil FCA</div>
+        <div class="signal-board">
+          <div class="signal-card">
+            <span>Decision</span>
+            <strong class="decision" id="decisionValue">-</strong>
+            <small id="decisionHint">Menunggu kalkulasi</small>
+          </div>
+          <div class="signal-card">
+            <span>Score</span>
+            <strong id="scoreValue">0/6</strong>
+            <small>Rule valid</small>
+          </div>
+          <div class="signal-card trend flat" id="bidTrendCard">
+            <span>Bid Trend</span>
+            <strong id="bidTrendValue">FLAT</strong>
+            <small id="bidTrendDetail">0.00%</small>
+          </div>
+          <div class="signal-card trend flat" id="offerTrendCard">
+            <span>Offer Trend</span>
+            <strong id="offerTrendValue">FLAT</strong>
+            <small id="offerTrendDetail">0.00%</small>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>A (Arah)</span>
+                <small class="formula">= IEP / Last Price</small>
+              </div>
+              <strong id="metricA">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Direction of price (&gt;=1 bullish)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>S (Supply Pressure)</span>
+                <small class="formula">= Offer / IEV</small>
+              </div>
+              <strong id="metricS">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Selling pressure</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>B (Buyer Strength)</span>
+                <small class="formula">= Bid / Offer</small>
+              </div>
+              <strong id="metricB">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Strength of buyers</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>R (Bid Retention)</span>
+                <small class="formula">= Bid_now / Bid_prev</small>
+              </div>
+              <strong id="metricR">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Buyer stability</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>G (Offer Growth)</span>
+                <small class="formula">= Offer_now / Offer_prev</small>
+              </div>
+              <strong id="metricG">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Supply increase</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>L (Activity)</span>
+                <small class="formula">= Lot_today / Lot_avg</small>
+              </div>
+              <strong id="metricL">0.00</strong>
+            </div>
+            <div class="meaning">Meaning: Market activity</div>
+          </div>
+        </div>
+        <div class="warning" id="warningBox">FAKE BID DETECTED</div>
+        <div class="warning early-warning" id="earlySellBox">EARLY SELL WARNING</div>
+      </section>
+
+      <section class="history-panel">
+        <div class="history-head">
+          <h2>Auto History</h2>
+          <div class="row" style="margin-top: 0;">
+            <span class="muted">Last 10 calculations</span>
+            <button class="btn btn-small btn-danger" id="clearHistoryBtn" type="button">Delete History</button>
+          </div>
+        </div>
+        <div class="history-scroll">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Decision</th>
+                <th>Score</th>
+                <th>Bid</th>
+                <th>Offer</th>
+                <th>A</th>
+                <th>S</th>
+                <th>B</th>
+                <th>R</th>
+                <th>G</th>
+                <th>L</th>
+                <th>Warning</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <div class="muted" id="historyEmpty" style="margin-top: 10px;">Belum ada history.</div>
+      </section>
+    </main>
+
+    <footer>Copyright by Ferry Pratama</footer>
+  </div>
+
+  <script src="fca.js"></script>
+</body>
+
+</html>
