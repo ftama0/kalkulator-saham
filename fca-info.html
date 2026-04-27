@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Info FCA Saham</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --panel: #ffffff;
+      --ink: #1b1b1b;
+      --muted: #6b6b6b;
+      --accent: #1b7f6b;
+      --accent-2: #d8702c;
+      --border: #e2dfd7;
+      --soft: #fbfaf7;
+      --buy: #15803d;
+      --hold: #d97706;
+      --sell: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Arial", "Helvetica", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 450px at 10% -20%, #f9efe0 0%, transparent 60%),
+        radial-gradient(700px 400px at 90% 0%, #e8f3ef 0%, transparent 55%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 32px auto 56px;
+      padding: 0 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .nav a.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .panel {
+      margin-top: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .subnav {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8f5ee;
+      flex-wrap: wrap;
+    }
+
+    .subnav a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .subnav a.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .card p,
+    .card li {
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .card ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .callout {
+      background: linear-gradient(135deg, #eef8f4, #fffaf2);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:hover {
+      background: #fcfbf8;
+    }
+
+    .section-title {
+      margin: 22px 0 10px;
+      font-size: 18px;
+    }
+
+    .formula {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f6f2e9;
+      border: 1px solid var(--border);
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tag.buy {
+      background: var(--buy);
+    }
+
+    .tag.hold {
+      background: var(--hold);
+    }
+
+    .tag.sell {
+      background: var(--sell);
+    }
+
+    footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 840px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .intro {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Info FCA</h1>
+      <div class="sub">Kamus variabel, arti input, dan cara membaca skor FCA.</div>
+    </header>
+    <nav class="nav">
+      <a href="index.html">Jual Beli</a>
+      <a href="avg-down.html">Average Down</a>
+      <a href="dividend.html">Dividen</a>
+      <a href="ara-arb.html">ARA / ARB</a>
+      <a class="active" href="fca.html">FCA</a>
+    </nav>
+
+    <main class="panel">
+      <div class="subnav" aria-label="FCA pages">
+        <a href="fca.html">Kalkulator FCA</a>
+        <a class="active" href="fca-info.html">Info FCA</a>
+      </div>
+
+      <section class="intro">
+        <div class="card callout">
+          <h2>Inti FCA</h2>
+          <p>FCA membaca keseimbangan antara harga indikatif, kekuatan bid, dan tekanan offer. Tujuannya bukan menebak masa depan secara mutlak, tapi memberi filter cepat apakah demand masih sehat atau mulai melemah.</p>
+          <ul>
+            <li><strong>BUY</strong> berarti bid kuat, offer relatif tipis, dan weighted score inti sudah tinggi.</li>
+            <li><strong>HOLD</strong> berarti ada campuran sinyal kuat dan lemah, jadi posisi perlu dipantau.</li>
+            <li><strong>SELL</strong> berarti demand melemah, supply naik, atau struktur order book mulai memburuk.</li>
+            <li><strong>SO</strong> membantu membaca apakah buangan saat ini masih tipis atau sudah berat.</li>
+            <li><strong>BSR</strong> membantu membaca apakah bid sekarang benar-benar didukung aktivitas baru atau hanya terlihat tebal.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Weighted Score</h2>
+          <p>Versi terbaru FCA tidak lagi memakai `Lot_avg` dan `L`. Score utama sekarang dibobotkan agar variabel paling penting punya pengaruh lebih besar.</p>
+          <p>Bobot yang dipakai: `R = 2.5`, `B = 2.5`, `G = 2.0`, `A = 1.5`, `S = 1.5`. Total maksimum score adalah `10.0`.</p>
+        </div>
+      </section>
+
+      <h2 class="section-title">Kamus Variabel Input</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Variabel</th>
+              <th>Label di UI</th>
+              <th>Arti</th>
+              <th>Sumber Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>IEP</strong></td>
+              <td>IEP (Indicative Equilibrium Price)</td>
+              <td>Harga indikatif equilibrium. Dipakai untuk melihat apakah arah harga masih di atas harga terakhir atau tidak.</td>
+              <td>Order book / indicative auction data.</td>
+            </tr>
+            <tr>
+              <td><strong>Last Price</strong></td>
+              <td>Last Price (harga terakhir)</td>
+              <td>Harga terakhir yang tercatat di market.</td>
+              <td>Running trade / last done.</td>
+            </tr>
+            <tr>
+              <td><strong>IEV</strong></td>
+              <td>IEV (Indicative Equilibrium Volume)</td>
+              <td>Volume indikatif equilibrium pada snapshot sekarang.</td>
+              <td>Order book / indicative auction data.</td>
+            </tr>
+            <tr>
+              <td><strong>Bid_now</strong></td>
+              <td>Bid_now (bid snapshot sekarang)</td>
+              <td>Total kekuatan antrean beli pada snapshot saat ini.</td>
+              <td>Order book sekarang.</td>
+            </tr>
+            <tr>
+              <td><strong>Bid_prev</strong></td>
+              <td>Bid_prev (bid snapshot sebelumnya)</td>
+              <td>Total antrean beli pada snapshot sebelumnya di hari yang sama.</td>
+              <td>Order book snapshot 1-2 menit sebelumnya.</td>
+            </tr>
+            <tr>
+              <td><strong>Offer_now</strong></td>
+              <td>Offer_now (offer snapshot sekarang)</td>
+              <td>Total kekuatan antrean jual pada snapshot saat ini.</td>
+              <td>Order book sekarang.</td>
+            </tr>
+            <tr>
+              <td><strong>Offer_prev</strong></td>
+              <td>Offer_prev (offer snapshot sebelumnya)</td>
+              <td>Total antrean jual pada snapshot sebelumnya di hari yang sama.</td>
+              <td>Order book snapshot 1-2 menit sebelumnya.</td>
+            </tr>
+            <tr>
+              <td><strong>Lot_today</strong></td>
+              <td>Lot_today (aktivitas market hari ini)</td>
+              <td>Total aktivitas lot/volume yang sudah berjalan hari ini.</td>
+              <td>Running volume harian.</td>
+            </tr>
+            <tr>
+              <td><strong>Lot_prev</strong></td>
+              <td>Lot_prev total (snapshot sebelumnya)</td>
+              <td>Total lot akumulasi pada snapshot sebelumnya. Ini bukan tambahan lot, tapi total lot sebelumnya yang dipakai untuk menghitung delta lot.</td>
+              <td>Running volume pada snapshot 1-2 menit sebelumnya.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title">Kamus Variabel Turunan</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Variabel</th>
+              <th>Formula</th>
+              <th>Arti</th>
+              <th>Cara Baca Cepat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A</strong> (Arah)</td>
+              <td><span class="formula">IEP / Last Price</span></td>
+              <td>Arah harga indikatif terhadap harga terakhir.</td>
+              <td>`>= 1` cenderung bullish.</td>
+            </tr>
+            <tr>
+              <td><strong>S</strong> (Supply Pressure)</td>
+              <td><span class="formula">Offer_now / IEV</span></td>
+              <td>Tekanan jual relatif terhadap volume equilibrium.</td>
+              <td>Semakin kecil, semakin tipis tekanan jual.</td>
+            </tr>
+            <tr>
+              <td><strong>B</strong> (Buyer Strength)</td>
+              <td><span class="formula">Bid_now / Offer_now</span></td>
+              <td>Kekuatan buyer dibanding seller.</td>
+              <td>Semakin besar, buyer semakin dominan.</td>
+            </tr>
+            <tr>
+              <td><strong>R</strong> (Bid Retention)</td>
+              <td><span class="formula">Bid_now / Bid_prev</span></td>
+              <td>Ketahanan demand dari snapshot ke snapshot.</td>
+              <td>Tinggi berarti bid tidak cepat hilang.</td>
+            </tr>
+            <tr>
+              <td><strong>G</strong> (Offer Growth)</td>
+              <td><span class="formula">Offer_now / Offer_prev</span></td>
+              <td>Pertumbuhan supply dari snapshot ke snapshot.</td>
+              <td>Tinggi berarti offer membengkak.</td>
+            </tr>
+            <tr>
+              <td><strong>F</strong> (Fake Bid Check)</td>
+              <td><span class="formula">Bid_now / IEV</span></td>
+              <td>Indikator tambahan untuk cek fake bid.</td>
+              <td>Besar sendiri belum cukup, harus dilihat bersama `R`.</td>
+            </tr>
+            <tr>
+              <td><strong>SO</strong> (Buangan Ratio)</td>
+              <td><span class="formula">Offer_now / Bid_now</span></td>
+              <td>Mengukur besar buangan saat ini dibanding bid saat ini.</td>
+              <td>Semakin kecil, buangan semakin tipis. Di atas `1` berarti offer lebih besar dari bid.</td>
+            </tr>
+            <tr>
+              <td><strong>BSR</strong> (Bid Support Ratio)</td>
+              <td><span class="formula">Bid_now / (Lot_today - Lot_prev total)</span></td>
+              <td>Mengukur seberapa besar bid sekarang dibanding aktivitas baru antar snapshot.</td>
+              <td>Semakin besar, bid makin rawan bias atau tidak didukung flow baru.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title">Cara Baca Hasil</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Arti</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Score</strong></td>
+              <td>Jumlah bobot rule inti yang lolos.</td>
+              <td>Maksimum `10.0` dari A, S, B, R, dan G.</td>
+            </tr>
+            <tr>
+              <td><span class="tag buy">BUY</span></td>
+              <td>Demand kuat dan struktur masih sehat.</td>
+              <td>Weighted score `>= 8.0`.</td>
+            </tr>
+            <tr>
+              <td><span class="tag hold">HOLD</span></td>
+              <td>Sinyal campuran, belum sekuat BUY tapi belum rusak total.</td>
+              <td>Weighted score `>= 5.0` dan `< 8.0`.</td>
+            </tr>
+            <tr>
+              <td><span class="tag sell">SELL</span></td>
+              <td>Demand melemah atau supply mulai dominan.</td>
+              <td>Weighted score `< 5.0`.</td>
+            </tr>
+            <tr>
+              <td><strong>Fake Bid Warning</strong></td>
+              <td>Bid terlihat besar, tapi tidak stabil.</td>
+              <td>Muncul jika `F > 3` dan `R < 0.7`.</td>
+            </tr>
+            <tr>
+              <td><strong>Early Sell Warning</strong></td>
+              <td>Demand turun sementara supply naik cepat.</td>
+              <td>Muncul jika `R < 0.7` dan `G > 1.5`.</td>
+            </tr>
+            <tr>
+              <td><strong>SO</strong></td>
+              <td>Pembacaan cepat buangan saat ini.</td>
+              <td>`< 0.5` tipis, `0.5 - 1` normal, `> 1` buangan mulai berat.</td>
+            </tr>
+            <tr>
+              <td><strong>BSR</strong></td>
+              <td>Pembacaan cepat apakah bid didukung transaksi baru.</td>
+              <td>`<= 1.5` masih sehat, `1.5 - 3` mulai bias, `> 3` rawan bid semu.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>Copyright by Ferry Pratama</footer>
+  </div>
+</body>
+
+</html>

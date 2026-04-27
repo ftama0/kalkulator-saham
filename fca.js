@@ -12,8 +12,10 @@ const fields = [
   "offerNow",
   "offerPrev",
   "lotToday",
-  "lotAvg",
 ];
+
+const extraFields = ["lotPrev"];
+const allFields = [...fields, ...extraFields];
 
 const unitFields = [
   "iev",
@@ -22,7 +24,7 @@ const unitFields = [
   "offerNow",
   "offerPrev",
   "lotToday",
-  "lotAvg",
+  "lotPrev",
 ];
 
 const labels = {
@@ -34,8 +36,18 @@ const labels = {
   offerNow: "Offer_now",
   offerPrev: "Offer_prev",
   lotToday: "Lot_today",
-  lotAvg: "Lot_avg",
+  lotPrev: "Lot_prev total",
 };
+
+const SCORE_WEIGHTS = {
+  A: 1.5,
+  S: 1.5,
+  B: 2.5,
+  R: 2.5,
+  G: 2.0,
+};
+
+const MAX_SCORE = 10;
 
 const unitMultipliers = {
   "": 1,
@@ -130,7 +142,7 @@ const setFieldError = (id, hasError) => {
 };
 
 const clearFieldErrors = () => {
-  fields.forEach((id) => setFieldError(id, false));
+  allFields.forEach((id) => setFieldError(id, false));
 };
 
 const setDecisionClass = (decision) => {
@@ -143,11 +155,6 @@ const setDecisionClass = (decision) => {
   resultBox.classList.add(className);
   decisionValue.classList.add(className);
 };
-
-const getPositionMode = () =>
-  document.querySelector('input[name="positionMode"]:checked')?.value || "noPosition";
-
-const hasPosition = () => getPositionMode() === "hasPosition";
 
 const getDecisionHint = (decision) => {
   if (decision === "BUY") return "Demand kuat";
@@ -184,8 +191,7 @@ const setTrendCard = (cardId, valueId, detailId, trend) => {
 
 const validate = (values) => {
   clearFieldErrors();
-  const requiredFields = hasPosition() ? fields.filter((id) => id !== "lotAvg") : fields;
-  const emptyFields = requiredFields.filter((id) => values[id] === null);
+  const emptyFields = fields.filter((id) => values[id] === null);
   emptyFields.forEach((id) => setFieldError(id, true));
 
   if (emptyFields.length) {
@@ -204,32 +210,67 @@ const safeDivide = (numerator, denominator) => {
 
 const pass = (value, test) => Number.isFinite(value) && test(value);
 
+const getSoMeaning = (value) => {
+  if (!Number.isFinite(value)) return "Meaning: Isi Bid_now dan Offer_now untuk baca buangan";
+  if (value < 0.5) return "Meaning: Buangan tipis, offer masih jauh lebih kecil dari bid";
+  if (value <= 1) return "Meaning: Buangan normal, offer mulai mengejar bid";
+  return "Meaning: Buangan berat, offer sudah besar atau dominan";
+};
+
+const getBsrMeaning = (value, deltaLot) => {
+  if (deltaLot === null) return "Meaning: Isi Lot_prev total untuk mengaktifkan BSR";
+  if (!Number.isFinite(deltaLot) || deltaLot <= 0) {
+    return "Meaning: Delta lot <= 0, cek urutan snapshot Lot_today dan Lot_prev";
+  }
+  if (!Number.isFinite(value)) return "Meaning: BSR belum bisa dihitung";
+  if (value <= 1.5) return "Meaning: Bid masih didukung aktivitas baru";
+  if (value <= 3) return "Meaning: Bid mulai lebih besar dari flow baru";
+  return "Meaning: Bid rawan bias atau fake, flow baru terlalu kecil";
+};
+
 const calculate = (values) => {
-  const positionHasLot = hasPosition();
   const A = safeDivide(values.iep, values.lastPrice);
   const S = safeDivide(values.offerNow, values.iev);
   const B = safeDivide(values.bidNow, values.offerNow);
   const R = safeDivide(values.bidNow, values.bidPrev);
   const G = safeDivide(values.offerNow, values.offerPrev);
-  const L = positionHasLot ? null : safeDivide(values.lotToday, values.lotAvg);
-  const maxScore = positionHasLot ? 5 : 6;
+  const SO = safeDivide(values.offerNow, values.bidNow);
+  const deltaLot =
+    values.lotToday !== null && values.lotPrev !== null
+      ? values.lotToday - values.lotPrev
+      : null;
+  const BSR = deltaLot !== null && deltaLot > 0 ? safeDivide(values.bidNow, deltaLot) : null;
 
   let score = 0;
-  if (pass(A, (value) => value >= 1)) score++;
-  if (pass(S, (value) => value <= 0.3)) score++;
-  if (pass(B, (value) => value >= 2)) score++;
-  if (pass(R, (value) => value >= 0.7)) score++;
-  if (pass(G, (value) => value <= 1.3)) score++;
-  if (!positionHasLot && pass(L, (value) => value <= 1.5)) score++;
+  if (pass(A, (value) => value >= 1)) score += SCORE_WEIGHTS.A;
+  if (pass(S, (value) => value <= 0.3)) score += SCORE_WEIGHTS.S;
+  if (pass(B, (value) => value >= 2)) score += SCORE_WEIGHTS.B;
+  if (pass(R, (value) => value >= 0.7)) score += SCORE_WEIGHTS.R;
+  if (pass(G, (value) => value <= 1.3)) score += SCORE_WEIGHTS.G;
 
-  const decision = score >= 5 ? "BUY" : score >= 3 ? "HOLD" : "SELL";
+  const decision = score >= 8 ? "BUY" : score >= 5 ? "HOLD" : "SELL";
   const F = safeDivide(values.bidNow, values.iev);
   const fakeBid = pass(F, (value) => value > 3) && pass(R, (value) => value < 0.7);
   const earlySell = pass(R, (value) => value < 0.7) && pass(G, (value) => value > 1.5);
   const bidTrend = getTrend(values.bidNow, values.bidPrev, "bid");
   const offerTrend = getTrend(values.offerNow, values.offerPrev, "offer");
 
-  return { A, S, B, R, G, L, score, maxScore, decision, fakeBid, earlySell, bidTrend, offerTrend };
+  return {
+    A,
+    S,
+    B,
+    R,
+    G,
+    SO,
+    BSR,
+    deltaLot,
+    score,
+    decision,
+    fakeBid,
+    earlySell,
+    bidTrend,
+    offerTrend,
+  };
 };
 
 const renderResult = (result) => {
@@ -238,8 +279,11 @@ const renderResult = (result) => {
   el("metricB").textContent = format2(result.B);
   el("metricR").textContent = format2(result.R);
   el("metricG").textContent = format2(result.G);
-  el("metricL").textContent = format2(result.L);
-  el("scoreValue").textContent = `${result.score} / ${result.maxScore}`;
+  el("metricSO").textContent = format2(result.SO);
+  el("metricBSR").textContent = format2(result.BSR);
+  el("metricSOMeaning").textContent = getSoMeaning(result.SO);
+  el("metricBSRMeaning").textContent = getBsrMeaning(result.BSR, result.deltaLot);
+  el("scoreValue").textContent = `${format2(result.score)} / ${format2(MAX_SCORE)}`;
   el("decisionValue").textContent = result.decision;
   el("decisionHint").textContent = getDecisionHint(result.decision);
   el("warningBox").style.display = result.fakeBid ? "block" : "none";
@@ -305,7 +349,8 @@ const renderHistory = () => {
       <td>${format2(item.B)}</td>
       <td>${format2(item.R)}</td>
       <td>${format2(item.G)}</td>
-      <td>${format2(item.L)}</td>
+      <td>${format2(item.SO)}</td>
+      <td>${format2(item.BSR)}</td>
       <td>${warning ? `<span class="badge warn">${warning}</span>` : "-"}</td>
     `;
     body.appendChild(tr);
@@ -320,9 +365,9 @@ const addHistory = (result) => {
     B: result.B,
     R: result.R,
     G: result.G,
-    L: result.L,
+    SO: result.SO,
+    BSR: result.BSR,
     score: result.score,
-    maxScore: result.maxScore,
     decision: result.decision,
     fakeBid: result.fakeBid,
     earlySell: result.earlySell,
@@ -341,7 +386,7 @@ const clearHistory = () => {
 };
 
 const handleCalculate = () => {
-  const values = Object.fromEntries(fields.map((id) => [id, readValue(id)]));
+  const values = Object.fromEntries(allFields.map((id) => [id, readValue(id)]));
   const error = validate(values);
 
   if (error) {
@@ -366,32 +411,21 @@ const sanitizeInput = (id) => {
   if (input.value !== sanitized) input.value = sanitized;
 };
 
-const applyPositionMode = () => {
-  const lotAvgField = document.querySelector('[data-field="lotAvg"]');
-  lotAvgField.classList.toggle("optional", hasPosition());
-  if (hasPosition()) setFieldError("lotAvg", false);
-};
-
 const init = () => {
   loadHistory();
   renderHistory();
-  applyPositionMode();
 
   el("fcaForm").addEventListener("submit", (event) => {
     event.preventDefault();
-    fields.forEach(formatInput);
+    allFields.forEach(formatInput);
     handleCalculate();
   });
 
   el("clearHistoryBtn").addEventListener("click", clearHistory);
 
-  fields.forEach((id) => {
+  allFields.forEach((id) => {
     el(id).addEventListener("input", () => sanitizeInput(id));
     el(id).addEventListener("blur", () => formatInput(id));
-  });
-
-  document.querySelectorAll('input[name="positionMode"]').forEach((radio) => {
-    radio.addEventListener("change", applyPositionMode);
   });
 };
 

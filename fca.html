@@ -38,8 +38,8 @@
 
     .wrap {
       max-width: 1120px;
-      margin: 32px auto 56px;
-      padding: 0 20px;
+      margin: 22px auto 34px;
+      padding: 0 14px;
     }
 
     header {
@@ -51,27 +51,27 @@
 
     h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 24px;
       letter-spacing: 0.5px;
     }
 
     .sub {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .nav {
       display: flex;
-      gap: 12px;
-      margin-top: 12px;
-      font-size: 14px;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 13px;
       flex-wrap: wrap;
     }
 
     .nav a {
       text-decoration: none;
       color: var(--ink);
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: #fff;
@@ -84,34 +84,121 @@
     }
 
     .panel {
-      margin-top: 18px;
+      margin-top: 14px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 20px;
+      padding: 14px;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .subnav {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8f5ee;
+      flex-wrap: wrap;
+    }
+
+    .subnav a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .subnav a.active {
+      background: var(--accent);
+      color: #fff;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px 18px;
+      gap: 9px 10px;
+    }
+
+    .pair-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px 10px;
+      margin-top: 8px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
+    }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .label-row label {
+      margin-bottom: 0;
+    }
+
+    .info-tip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      cursor: help;
+      user-select: none;
+    }
+
+    .info-tip span {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      width: 220px;
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 10px;
+      line-height: 1.45;
+      text-align: left;
+      box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.16s ease;
+      z-index: 10;
+    }
+
+    .info-tip:hover span,
+    .info-tip:focus-visible span {
+      opacity: 1;
+      visibility: visible;
     }
 
     input,
     select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 7px 9px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 13px;
       background: #fff;
     }
 
@@ -121,41 +208,10 @@
       border-color: var(--accent);
     }
 
-    .position-mode {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fbfaf7;
-    }
-
-    .radio-card {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: #fff;
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .radio-card input {
-      width: auto;
-      margin: 0;
-    }
-
     .input-unit {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 78px;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1fr) 64px;
+      gap: 6px;
     }
 
     .input-field.field-error input,
@@ -164,38 +220,32 @@
       background: var(--sell-soft);
     }
 
-    .input-field.optional label::after {
-      content: " optional";
-      color: var(--muted);
-      font-weight: 400;
-    }
-
     .field-hot label {
       font-weight: 700;
       color: var(--ink);
     }
 
     .field-hot input {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 700;
     }
 
     .row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       align-items: center;
-      margin-top: 16px;
+      margin-top: 10px;
     }
 
     .btn {
       border: 0;
       border-radius: 10px;
-      padding: 10px 16px;
+      padding: 7px 12px;
       background: var(--accent);
       color: #fff;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
     }
 
@@ -204,9 +254,9 @@
     }
 
     .btn-small {
-      padding: 6px 10px;
+      padding: 4px 8px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 10px;
     }
 
     .btn-danger {
@@ -215,24 +265,24 @@
 
     .muted {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .error {
       display: none;
-      margin-top: 14px;
-      padding: 12px 14px;
+      margin-top: 10px;
+      padding: 9px 11px;
       border: 1px solid #f2c9c7;
       border-radius: 12px;
       background: var(--sell-soft);
       color: var(--sell);
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .result {
       display: none;
-      margin-top: 18px;
-      padding: 16px;
+      margin-top: 12px;
+      padding: 10px;
       border-radius: 14px;
       border: 1px solid var(--border);
       background: #f8f6f1;
@@ -254,9 +304,9 @@
     }
 
     .result-title {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
     }
@@ -264,14 +314,14 @@
     .signal-board {
       display: grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 7px;
+      margin-bottom: 7px;
     }
 
     .signal-card {
       display: grid;
       gap: 4px;
-      padding: 14px;
+      padding: 9px 10px;
       border: 1px solid var(--border);
       border-radius: 14px;
       background: #fff;
@@ -279,20 +329,20 @@
 
     .signal-card span {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
     .signal-card strong {
-      font-size: 28px;
+      font-size: 20px;
       line-height: 1.1;
     }
 
     .signal-card small {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 700;
     }
 
@@ -320,15 +370,15 @@
 
     .metrics {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
     }
 
     .metric,
     .decision-card {
       display: grid;
-      gap: 8px;
-      padding: 10px 12px;
+      gap: 5px;
+      padding: 8px 9px;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: #fff;
@@ -337,7 +387,7 @@
     .metric-head {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 7px;
       align-items: start;
     }
 
@@ -349,25 +399,25 @@
     .metric-name span,
     .decision-card span {
       color: var(--ink);
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 800;
     }
 
     .formula {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 600;
     }
 
     .meaning {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 10px;
       line-height: 1.35;
     }
 
     .metric strong,
     .decision-card strong {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
     }
 
@@ -379,7 +429,7 @@
     }
 
     .decision {
-      font-size: 20px;
+      font-size: 17px;
     }
 
     .decision.buy {
@@ -396,13 +446,13 @@
 
     .warning {
       display: none;
-      margin-top: 12px;
-      padding: 12px 14px;
+      margin-top: 9px;
+      padding: 9px 10px;
       border: 1px solid #f2c9c7;
       border-radius: 12px;
       background: #fff;
       color: var(--sell);
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 800;
       letter-spacing: 0.06em;
       text-align: center;
@@ -416,8 +466,8 @@
     }
 
     .history-panel {
-      margin-top: 18px;
-      padding: 16px;
+      margin-top: 12px;
+      padding: 10px;
       border: 1px solid var(--border);
       border-radius: 14px;
       background: #fff;
@@ -427,13 +477,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 7px;
     }
 
     .history-head h2 {
       margin: 0;
-      font-size: 16px;
+      font-size: 13px;
     }
 
     .history-scroll {
@@ -444,20 +494,20 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      font-size: 13px;
+      font-size: 11px;
       white-space: nowrap;
     }
 
     .history-table th,
     .history-table td {
-      padding: 9px 10px;
+      padding: 6px 7px;
       border-bottom: 1px solid var(--border);
       text-align: left;
     }
 
     .history-table th {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -471,10 +521,10 @@
       align-items: center;
       justify-content: center;
       min-width: 54px;
-      padding: 4px 8px;
+      padding: 2px 6px;
       border-radius: 999px;
       color: #fff;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 800;
     }
 
@@ -508,6 +558,7 @@
       }
 
       .grid,
+      .pair-grid,
       .signal-board,
       .metrics,
       .decision-row {
@@ -516,7 +567,7 @@
     }
 
     footer {
-      margin-top: 24px;
+      margin-top: 16px;
       font-size: 12px;
       color: var(--muted);
       text-align: center;
@@ -539,29 +590,32 @@
     </nav>
 
     <main class="panel">
-      <form id="fcaForm" novalidate>
-        <div class="position-mode" role="radiogroup" aria-label="Position mode">
-          <label class="radio-card">
-            <input id="hasPosition" type="radio" name="positionMode" value="hasPosition" />
-            I already have position
-          </label>
-          <label class="radio-card">
-            <input id="noPosition" type="radio" name="positionMode" value="noPosition" checked />
-            I do not have position
-          </label>
-        </div>
+      <div class="subnav" aria-label="FCA pages">
+        <a class="active" href="fca.html">Kalkulator FCA</a>
+        <a href="fca-info.html">Info FCA</a>
+      </div>
 
+      <form id="fcaForm" novalidate>
         <div class="grid">
           <div class="input-field" data-field="iep">
-            <label for="iep">IEP</label>
+            <div class="label-row">
+              <label for="iep">IEP</label>
+              <div class="info-tip" tabindex="0" aria-label="Info IEP">i<span>Indicative Equilibrium Price. Harga indikatif equilibrium pada snapshot saat ini.</span></div>
+            </div>
             <input id="iep" type="text" inputmode="decimal" placeholder="1500" />
           </div>
           <div class="input-field" data-field="lastPrice">
-            <label for="lastPrice">Last Price</label>
+            <div class="label-row">
+              <label for="lastPrice">Last Price</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Last Price">i<span>Harga terakhir yang terjadi di market.</span></div>
+            </div>
             <input id="lastPrice" type="text" inputmode="decimal" placeholder="1450" />
           </div>
           <div class="input-field" data-field="iev">
-            <label for="iev">IEV</label>
+            <div class="label-row">
+              <label for="iev">IEV</label>
+              <div class="info-tip" tabindex="0" aria-label="Info IEV">i<span>Indicative Equilibrium Volume. Volume indikatif equilibrium pada snapshot saat ini.</span></div>
+            </div>
             <div class="input-unit">
               <input id="iev" type="text" inputmode="decimal" placeholder="100" />
               <select id="ievUnit" aria-label="IEV unit">
@@ -573,8 +627,14 @@
               </select>
             </div>
           </div>
+        </div>
+
+        <div class="pair-grid">
           <div class="input-field field-hot" data-field="bidNow">
-            <label for="bidNow">Bid_now</label>
+            <div class="label-row">
+              <label for="bidNow">Bid_now</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Bid now">i<span>Total bid pada snapshot sekarang.</span></div>
+            </div>
             <div class="input-unit">
               <input id="bidNow" type="text" inputmode="decimal" placeholder="70" />
               <select id="bidNowUnit" aria-label="Bid_now unit">
@@ -587,7 +647,10 @@
             </div>
           </div>
           <div class="input-field" data-field="bidPrev">
-            <label for="bidPrev">Bid_prev</label>
+            <div class="label-row">
+              <label for="bidPrev">Bid_prev</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Bid prev">i<span>Total bid pada snapshot sebelumnya di hari yang sama.</span></div>
+            </div>
             <div class="input-unit">
               <input id="bidPrev" type="text" inputmode="decimal" placeholder="90" />
               <select id="bidPrevUnit" aria-label="Bid_prev unit">
@@ -599,8 +662,14 @@
               </select>
             </div>
           </div>
+        </div>
+
+        <div class="pair-grid">
           <div class="input-field field-hot" data-field="offerNow">
-            <label for="offerNow">Offer_now</label>
+            <div class="label-row">
+              <label for="offerNow">Offer_now</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Offer now">i<span>Total offer pada snapshot sekarang.</span></div>
+            </div>
             <div class="input-unit">
               <input id="offerNow" type="text" inputmode="decimal" placeholder="30" />
               <select id="offerNowUnit" aria-label="Offer_now unit">
@@ -613,7 +682,10 @@
             </div>
           </div>
           <div class="input-field" data-field="offerPrev">
-            <label for="offerPrev">Offer_prev</label>
+            <div class="label-row">
+              <label for="offerPrev">Offer_prev</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Offer prev">i<span>Total offer pada snapshot sebelumnya di hari yang sama.</span></div>
+            </div>
             <div class="input-unit">
               <input id="offerPrev" type="text" inputmode="decimal" placeholder="25" />
               <select id="offerPrevUnit" aria-label="Offer_prev unit">
@@ -625,8 +697,14 @@
               </select>
             </div>
           </div>
+        </div>
+
+        <div class="pair-grid">
           <div class="input-field" data-field="lotToday">
-            <label for="lotToday">Lot_today</label>
+            <div class="label-row">
+              <label for="lotToday">Lot_today</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Lot today">i<span>Total aktivitas lot/volume market sampai snapshot sekarang.</span></div>
+            </div>
             <div class="input-unit">
               <input id="lotToday" type="text" inputmode="decimal" placeholder="12" />
               <select id="lotTodayUnit" aria-label="Lot_today unit">
@@ -638,11 +716,14 @@
               </select>
             </div>
           </div>
-          <div class="input-field" data-field="lotAvg">
-            <label for="lotAvg">Lot_avg</label>
+          <div class="input-field" data-field="lotPrev">
+            <div class="label-row">
+              <label for="lotPrev">Lot_prev total</label>
+              <div class="info-tip" tabindex="0" aria-label="Info Lot prev">i<span>Total lot akumulasi pada snapshot sebelumnya. Dipakai untuk menghitung BSR melalui selisih aktivitas baru.</span></div>
+            </div>
             <div class="input-unit">
-              <input id="lotAvg" type="text" inputmode="decimal" placeholder="10" />
-              <select id="lotAvgUnit" aria-label="Lot_avg unit">
+              <input id="lotPrev" type="text" inputmode="decimal" placeholder="10.5" />
+              <select id="lotPrevUnit" aria-label="Lot_prev unit">
                 <option value="">Unit</option>
                 <option value="K">K</option>
                 <option value="M">M</option>
@@ -655,7 +736,7 @@
 
         <div class="row">
           <button class="btn" type="submit">Calculate</button>
-          <span class="muted">Gunakan unit K/M/B/T untuk input cepat. Angka otomatis diformat dengan koma.</span>
+          <span class="muted">Gunakan unit K/M/B/T untuk input cepat. Score kini berbobot berdasarkan variabel terpenting.</span>
         </div>
       </form>
 
@@ -671,8 +752,8 @@
           </div>
           <div class="signal-card">
             <span>Score</span>
-            <strong id="scoreValue">0/6</strong>
-            <small>Rule valid</small>
+            <strong id="scoreValue">0.00 / 10.00</strong>
+            <small>Weighted score</small>
           </div>
           <div class="signal-card trend flat" id="bidTrendCard">
             <span>Bid Trend</span>
@@ -739,12 +820,22 @@
           <div class="metric">
             <div class="metric-head">
               <div class="metric-name">
-                <span>L (Activity)</span>
-                <small class="formula">= Lot_today / Lot_avg</small>
+                <span>SO (Buangan Ratio)</span>
+                <small class="formula">= Offer_now / Bid_now</small>
               </div>
-              <strong id="metricL">0.00</strong>
+              <strong id="metricSO">0.00</strong>
             </div>
-            <div class="meaning">Meaning: Market activity</div>
+            <div class="meaning" id="metricSOMeaning">Meaning: Offer size compared to current bid</div>
+          </div>
+          <div class="metric">
+            <div class="metric-head">
+              <div class="metric-name">
+                <span>BSR (Bid Support Ratio)</span>
+                <small class="formula">= Bid_now / (Lot_today - Lot_prev total)</small>
+              </div>
+              <strong id="metricBSR">0.00</strong>
+            </div>
+            <div class="meaning" id="metricBSRMeaning">Meaning: Bid support versus fresh activity flow</div>
           </div>
         </div>
         <div class="warning" id="warningBox">FAKE BID DETECTED</div>
@@ -773,7 +864,8 @@
                 <th>B</th>
                 <th>R</th>
                 <th>G</th>
-                <th>L</th>
+                <th>SO</th>
+                <th>BSR</th>
                 <th>Warning</th>
               </tr>
             </thead>
