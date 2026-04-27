@@ -269,6 +269,8 @@
             <li><strong>BUY</strong> berarti bid kuat, offer relatif tipis, dan weighted score inti sudah tinggi.</li>
             <li><strong>HOLD</strong> berarti ada campuran sinyal kuat dan lemah, jadi posisi perlu dipantau.</li>
             <li><strong>SELL</strong> berarti demand melemah, supply naik, atau struktur order book mulai memburuk.</li>
+            <li><strong>Early Session Mode</strong> dipakai saat data `prev` belum ada, jadi score hanya membaca `A`, `S`, dan `B`.</li>
+            <li><strong>Full Mode</strong> dipakai saat snapshot sebelumnya sudah tersedia, jadi `R` dan `G` ikut aktif.</li>
             <li><strong>SO</strong> membantu membaca apakah buangan saat ini masih tipis atau sudah berat.</li>
             <li><strong>BSR</strong> membantu membaca apakah bid sekarang benar-benar didukung aktivitas baru atau hanya terlihat tebal.</li>
           </ul>
@@ -431,19 +433,29 @@
               <td>Maksimum `10.0` dari A, S, B, R, dan G.</td>
             </tr>
             <tr>
+              <td><strong>Early Session Mode</strong></td>
+              <td>Mode ringan saat `Bid_prev` dan `Offer_prev` belum tersedia.</td>
+              <td>Weighted score maksimum `5.5` dari A, S, dan B.</td>
+            </tr>
+            <tr>
+              <td><strong>Full Mode</strong></td>
+              <td>Mode lengkap saat data snapshot sebelumnya sudah ada.</td>
+              <td>Weighted score maksimum `10.0` dari A, S, B, R, dan G.</td>
+            </tr>
+            <tr>
               <td><span class="tag buy">BUY</span></td>
               <td>Demand kuat dan struktur masih sehat.</td>
-              <td>Weighted score `>= 8.0`.</td>
+              <td>Threshold adaptif: `>= 80%` dari bobot aktif mode saat itu.</td>
             </tr>
             <tr>
               <td><span class="tag hold">HOLD</span></td>
               <td>Sinyal campuran, belum sekuat BUY tapi belum rusak total.</td>
-              <td>Weighted score `>= 5.0` dan `< 8.0`.</td>
+              <td>Threshold adaptif: `>= 50%` dan `< 80%` dari bobot aktif.</td>
             </tr>
             <tr>
               <td><span class="tag sell">SELL</span></td>
               <td>Demand melemah atau supply mulai dominan.</td>
-              <td>Weighted score `< 5.0`.</td>
+              <td>Threshold adaptif: `< 50%` dari bobot aktif.</td>
             </tr>
             <tr>
               <td><strong>Fake Bid Warning</strong></td>

@@ -48,6 +48,8 @@ const SCORE_WEIGHTS = {
 };
 
 const MAX_SCORE = 10;
+const EARLY_SCORE_KEYS = ["A", "S", "B"];
+const FULL_SCORE_KEYS = ["A", "S", "B", "R", "G"];
 
 const unitMultipliers = {
   "": 1,
@@ -145,6 +147,9 @@ const clearFieldErrors = () => {
   allFields.forEach((id) => setFieldError(id, false));
 };
 
+const getMode = () =>
+  document.querySelector('input[name="fcaMode"]:checked')?.value || "full";
+
 const setDecisionClass = (decision) => {
   const resultBox = el("resultBox");
   const decisionValue = el("decisionValue");
@@ -191,7 +196,11 @@ const setTrendCard = (cardId, valueId, detailId, trend) => {
 
 const validate = (values) => {
   clearFieldErrors();
-  const emptyFields = fields.filter((id) => values[id] === null);
+  const requiredFields =
+    getMode() === "early"
+      ? ["iep", "lastPrice", "iev", "bidNow", "offerNow"]
+      : ["iep", "lastPrice", "iev", "bidNow", "bidPrev", "offerNow", "offerPrev"];
+  const emptyFields = requiredFields.filter((id) => values[id] === null);
   emptyFields.forEach((id) => setFieldError(id, true));
 
   if (emptyFields.length) {
@@ -229,6 +238,8 @@ const getBsrMeaning = (value, deltaLot) => {
 };
 
 const calculate = (values) => {
+  const mode = getMode();
+  const activeScoreKeys = mode === "early" ? EARLY_SCORE_KEYS : FULL_SCORE_KEYS;
   const A = safeDivide(values.iep, values.lastPrice);
   const S = safeDivide(values.offerNow, values.iev);
   const B = safeDivide(values.bidNow, values.offerNow);
@@ -242,20 +253,26 @@ const calculate = (values) => {
   const BSR = deltaLot !== null && deltaLot > 0 ? safeDivide(values.bidNow, deltaLot) : null;
 
   let score = 0;
-  if (pass(A, (value) => value >= 1)) score += SCORE_WEIGHTS.A;
-  if (pass(S, (value) => value <= 0.3)) score += SCORE_WEIGHTS.S;
-  if (pass(B, (value) => value >= 2)) score += SCORE_WEIGHTS.B;
-  if (pass(R, (value) => value >= 0.7)) score += SCORE_WEIGHTS.R;
-  if (pass(G, (value) => value <= 1.3)) score += SCORE_WEIGHTS.G;
+  if (activeScoreKeys.includes("A") && pass(A, (value) => value >= 1)) score += SCORE_WEIGHTS.A;
+  if (activeScoreKeys.includes("S") && pass(S, (value) => value <= 0.3)) score += SCORE_WEIGHTS.S;
+  if (activeScoreKeys.includes("B") && pass(B, (value) => value >= 2)) score += SCORE_WEIGHTS.B;
+  if (activeScoreKeys.includes("R") && pass(R, (value) => value >= 0.7)) score += SCORE_WEIGHTS.R;
+  if (activeScoreKeys.includes("G") && pass(G, (value) => value <= 1.3)) score += SCORE_WEIGHTS.G;
 
-  const decision = score >= 8 ? "BUY" : score >= 5 ? "HOLD" : "SELL";
+  const maxScore = activeScoreKeys.reduce((total, key) => total + SCORE_WEIGHTS[key], 0);
+  const buyThreshold = maxScore * 0.8;
+  const holdThreshold = maxScore * 0.5;
+  const decision = score >= buyThreshold ? "BUY" : score >= holdThreshold ? "HOLD" : "SELL";
   const F = safeDivide(values.bidNow, values.iev);
-  const fakeBid = pass(F, (value) => value > 3) && pass(R, (value) => value < 0.7);
-  const earlySell = pass(R, (value) => value < 0.7) && pass(G, (value) => value > 1.5);
+  const fakeBid =
+    mode === "full" && pass(F, (value) => value > 3) && pass(R, (value) => value < 0.7);
+  const earlySell =
+    mode === "full" && pass(R, (value) => value < 0.7) && pass(G, (value) => value > 1.5);
   const bidTrend = getTrend(values.bidNow, values.bidPrev, "bid");
   const offerTrend = getTrend(values.offerNow, values.offerPrev, "offer");
 
   return {
+    mode,
     A,
     S,
     B,
@@ -265,6 +282,7 @@ const calculate = (values) => {
     BSR,
     deltaLot,
     score,
+    maxScore,
     decision,
     fakeBid,
     earlySell,
@@ -283,7 +301,7 @@ const renderResult = (result) => {
   el("metricBSR").textContent = format2(result.BSR);
   el("metricSOMeaning").textContent = getSoMeaning(result.SO);
   el("metricBSRMeaning").textContent = getBsrMeaning(result.BSR, result.deltaLot);
-  el("scoreValue").textContent = `${format2(result.score)} / ${format2(MAX_SCORE)}`;
+  el("scoreValue").textContent = `${format2(result.score)} / ${format2(result.maxScore)}`;
   el("decisionValue").textContent = result.decision;
   el("decisionHint").textContent = getDecisionHint(result.decision);
   el("warningBox").style.display = result.fakeBid ? "block" : "none";
@@ -340,8 +358,9 @@ const renderHistory = () => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${formatTime(item.createdAt)}</td>
+      <td>${item.mode === "early" ? "Early" : "Full"}</td>
       <td><span class="badge ${item.decision.toLowerCase()}">${item.decision}</span></td>
-      <td>${item.score}/${item.maxScore || 6}</td>
+      <td>${format2(item.score)}/${format2(item.maxScore || MAX_SCORE)}</td>
       <td>${trendBadge(item.bidTrend, "bid")}</td>
       <td>${trendBadge(item.offerTrend, "offer")}</td>
       <td>${format2(item.A)}</td>
@@ -368,6 +387,8 @@ const addHistory = (result) => {
     SO: result.SO,
     BSR: result.BSR,
     score: result.score,
+    maxScore: result.maxScore,
+    mode: result.mode,
     decision: result.decision,
     fakeBid: result.fakeBid,
     earlySell: result.earlySell,
@@ -383,6 +404,15 @@ const clearHistory = () => {
   history = [];
   saveHistory();
   renderHistory();
+};
+
+const applyMode = () => {
+  const modeHint =
+    getMode() === "early"
+      ? "Early session mode memakai A, S, dan B saja. Data prev belum wajib."
+      : "Full mode memakai A, S, B, R, dan G. Bid_prev dan Offer_prev wajib untuk pembacaan lengkap.";
+  el("modeHint").textContent = modeHint;
+  clearFieldErrors();
 };
 
 const handleCalculate = () => {
@@ -414,6 +444,7 @@ const sanitizeInput = (id) => {
 const init = () => {
   loadHistory();
   renderHistory();
+  applyMode();
 
   el("fcaForm").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -426,6 +457,10 @@ const init = () => {
   allFields.forEach((id) => {
     el(id).addEventListener("input", () => sanitizeInput(id));
     el(id).addEventListener("blur", () => formatInput(id));
+  });
+
+  document.querySelectorAll('input[name="fcaMode"]').forEach((radio) => {
+    radio.addEventListener("change", applyMode);
   });
 };
 

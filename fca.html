@@ -123,6 +123,45 @@
       gap: 9px 10px;
     }
 
+    .mode-switch {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8f5ee;
+      flex-wrap: wrap;
+    }
+
+    .mode-option {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .mode-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mode-option span {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 11px;
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-option input:checked + span {
+      background: var(--accent);
+      color: #fff;
+    }
+
     .pair-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -596,6 +635,17 @@
       </div>
 
       <form id="fcaForm" novalidate>
+        <div class="mode-switch" role="radiogroup" aria-label="FCA mode">
+          <label class="mode-option">
+            <input id="earlyMode" type="radio" name="fcaMode" value="early" />
+            <span>Early Session Mode</span>
+          </label>
+          <label class="mode-option">
+            <input id="fullMode" type="radio" name="fcaMode" value="full" checked />
+            <span>Full Mode</span>
+          </label>
+        </div>
+
         <div class="grid">
           <div class="input-field" data-field="iep">
             <div class="label-row">
@@ -738,6 +788,7 @@
           <button class="btn" type="submit">Calculate</button>
           <span class="muted">Gunakan unit K/M/B/T untuk input cepat. Score kini berbobot berdasarkan variabel terpenting.</span>
         </div>
+        <div class="muted" id="modeHint" style="margin-top: 6px;">Full mode memakai A, S, B, R, dan G. Early session mode hanya memakai A, S, dan B saat data prev belum tersedia.</div>
       </form>
 
       <div class="error" id="errorBox"></div>
@@ -855,6 +906,7 @@
             <thead>
               <tr>
                 <th>Time</th>
+                <th>Mode</th>
                 <th>Decision</th>
                 <th>Score</th>
                 <th>Bid</th>
