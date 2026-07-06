@@ -1,17 +1,33 @@
 const el = (id) => document.getElementById(id);
 
 const LEVEL_COUNT = 10;
+const SHARES_PER_LOT = 100;
+
+// ── Parsing ──────────────────────────────────────────
 
 const parseIDR = (value) => {
   const numeric = String(value || "").replace(/[^0-9]/g, "");
   return numeric ? Number(numeric) : 0;
 };
 
+const parseLots = () => {
+  const raw = el("lotCount").value || "";
+  const num = raw.replace(/[^0-9]/g, "");
+  return num ? Number(num) : 0;
+};
+
+// ── Formatting ───────────────────────────────────────
+
 const formatRupiahInput = (value) =>
   value ? `Rp ${new Intl.NumberFormat("id-ID").format(value)}` : "";
 
 const formatNumber = (value) =>
   new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
+
+const formatRupiah = (value) =>
+  `Rp ${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;
+
+// ── Rules ────────────────────────────────────────────
 
 const getAraPct = (price) => {
   if (price <= 200) return 35;
@@ -45,6 +61,8 @@ const roundUpToTick = (value) => {
   }
 };
 
+// ── Build levels ─────────────────────────────────────
+
 const buildLevels = (startPrice, direction) => {
   const items = [];
   let referencePrice = startPrice;
@@ -58,11 +76,14 @@ const buildLevels = (startPrice, direction) => {
     const price =
       direction === "up" ? roundDownToTick(rawPrice) : roundUpToTick(rawPrice);
 
+    const perLot = price * SHARES_PER_LOT;
+
     items.push({
       level,
       pct,
       price,
       tick: getTickSize(price),
+      perLot,
     });
 
     referencePrice = price;
@@ -72,74 +93,136 @@ const buildLevels = (startPrice, direction) => {
   return items;
 };
 
-const renderCenter = (price) => {
+// ── Render center summary ────────────────────────────
+
+const renderCenter = (price, lots) => {
   const centerCard = el("centerCard");
   if (!price) {
     centerCard.innerHTML = `
-      <div class="center-note">Current Price</div>
+      <div class="center-note">Harga Saat Ini</div>
       <div class="center-price">-</div>
-      <div class="center-note">Menunggu input harga</div>
+      <div class="center-meta">Menunggu input harga</div>
     `;
     return;
   }
 
+  const modalPerLot = price * SHARES_PER_LOT;
+
+  let info = `
+    <div class="center-nominal">
+      <div class="center-nominal-item">
+        <div class="cn-label">Modal / lot</div>
+        <div class="cn-value">${formatRupiah(modalPerLot)}</div>
+      </div>`;
+
+  if (lots > 0) {
+    info += `
+      <div class="center-nominal-item">
+        <div class="cn-label">Modal ${formatNumber(lots)} lot</div>
+        <div class="cn-value">${formatRupiah(modalPerLot * lots)}</div>
+      </div>`;
+  }
+
+  info += `</div>`;
+
   centerCard.innerHTML = `
-    <div class="center-note">Current Price</div>
+    <div class="center-note">Harga Saat Ini (Modal Awal)</div>
     <div class="center-price">${formatNumber(price)}</div>
-    <div class="center-note">
-      Tier aktif: ARA ${getAraPct(price)}% | ARB ${getArbPct()}%<br />
-      Tick size: Rp${formatNumber(getTickSize(price))}
+    <div class="center-meta">
+      Tier ARA ${getAraPct(price)}% &middot; ARB ${getArbPct()}% &middot;
+      Tick Rp${formatNumber(getTickSize(price))}
     </div>
+    ${info}
   `;
 };
 
-const renderList = (id, items, type) => {
-  const container = el(id);
+// ── Render table ─────────────────────────────────────
+
+const renderTable = (containerId, items, type, lots, startPrice) => {
+  const container = el(containerId);
+
   if (!items.length) {
     container.innerHTML = `
-      <div class="empty">Isi current price untuk menampilkan level ${
-        type === "up" ? "ARA" : "ARB"
-      }.</div>
+      <div class="empty">Masukkan current price untuk melihat level ${type === "up" ? "ARA" : "ARB"}.</div>
     `;
     return;
   }
 
-  const displayItems = type === "up" ? [...items].reverse() : items;
+  const label = type === "up" ? "ARA" : "ARB";
+  const cls = type === "up" ? "ara-table" : "arb-table";
+  const gainSign = type === "up" ? "+" : "\u2212";
 
-  container.innerHTML = displayItems
-    .map(
-      (item) => `
-        <div class="price-card ${type === "up" ? "up" : "down"}">
-          <div class="price-meta">
-            <span>${type === "up" ? "Batas atas" : "Batas bawah"}</span>
-            <strong>${formatNumber(item.price)}</strong>
-            <span>${item.pct}% | Tick Rp${formatNumber(item.tick)}</span>
-          </div>
-          <div class="level-tag">${type === "up" ? "ARA" : "ARB"} ${
-        item.level
-      }</div>
-        </div>
-      `
-    )
+  const rows = items
+    .map((item) => {
+      const diffPerLot = (item.price - startPrice) * SHARES_PER_LOT;
+      const diffClass = type === "up" ? "gain" : "loss";
+      const diffLabel = type === "up" ? "Untung" : "Rugi";
+
+      let totalDiffHtml = "";
+      if (lots > 0) {
+        totalDiffHtml = `<td class="${diffClass}">${gainSign}${formatRupiah(diffPerLot * lots)}</td>`;
+      }
+
+      return `
+        <tr>
+          <td>${label} ${item.level}</td>
+          <td>${item.pct}%</td>
+          <td>${formatNumber(item.price)}</td>
+          <td class="${diffClass}">${gainSign}${formatRupiah(Math.abs(diffPerLot))}</td>
+          <td>${formatRupiah(item.perLot)}</td>
+          ${lots > 0 ? `<td>${formatRupiah(item.perLot * lots)}</td>` : ""}
+          ${totalDiffHtml}
+          <td>${formatNumber(item.tick)}</td>
+        </tr>`;
+    })
     .join("");
+
+  const hasLots = lots > 0;
+  const diffLabel = type === "up" ? "Untung" : "Rugi";
+  const lotLabel = hasLots ? `(${formatNumber(lots)} lot)` : "";
+
+  container.innerHTML = `
+    <table class="${cls}">
+      <thead>
+        <tr>
+          <th class="col-level">Level</th>
+          <th class="col-pct">%</th>
+          <th class="col-price">Harga</th>
+          <th class="col-diff">${diffLabel} / lot</th>
+          <th class="col-nom">Nilai / lot</th>
+          ${hasLots ? `<th class="col-total-val">Nilai ${lotLabel}</th>` : ""}
+          ${hasLots ? `<th class="col-total-diff">${diffLabel} ${lotLabel}</th>` : ""}
+          <th class="col-tick">Tick</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
 };
+
+// ── Main render ──────────────────────────────────────
 
 const renderAll = () => {
   const currentPrice = parseIDR(el("currentPrice").value);
+  const lots = parseLots();
 
   if (currentPrice < 50) {
-    renderCenter(currentPrice);
-    el("araList").innerHTML =
+    renderCenter(currentPrice, lots);
+    el("araWrap").innerHTML =
       '<div class="empty">Masukkan current price minimal Rp50.</div>';
-    el("arbList").innerHTML =
+    el("arbWrap").innerHTML =
       '<div class="empty">Masukkan current price minimal Rp50.</div>';
     return;
   }
 
-  renderCenter(currentPrice);
-  renderList("araList", buildLevels(currentPrice, "up"), "up");
-  renderList("arbList", buildLevels(currentPrice, "down"), "down");
+  renderCenter(currentPrice, lots);
+  renderTable("araWrap", buildLevels(currentPrice, "up"), "up", lots, currentPrice);
+  renderTable("arbWrap", buildLevels(currentPrice, "down"), "down", lots, currentPrice);
 };
+
+// ── Input setup ──────────────────────────────────────
 
 const setupRupiahInput = () => {
   const input = el("currentPrice");
@@ -155,8 +238,16 @@ const setupRupiahInput = () => {
   input.addEventListener("input", renderAll);
 };
 
+const setupLotInput = () => {
+  const input = el("lotCount");
+  input.addEventListener("input", renderAll);
+};
+
+// ── Init ─────────────────────────────────────────────
+
 const init = () => {
   setupRupiahInput();
+  setupLotInput();
   renderAll();
 };
 

@@ -11,15 +11,28 @@
       --panel: #ffffff;
       --ink: #1e1b18;
       --muted: #6f6a64;
+      --muted-light: #8f8a84;
       --accent: #9a3412;
       --accent-soft: #fff1e8;
       --up: #0f766e;
       --up-soft: #ebfffb;
+      --up-border: #b9ebe1;
+      --up-head-bg: #0d9488;
+      --up-head-text: #fff;
       --down: #b42318;
       --down-soft: #fff5f5;
+      --down-border: #f2c9c7;
+      --down-head-bg: #dc2626;
+      --down-head-text: #fff;
       --center: #1d4ed8;
       --center-soft: #eef4ff;
       --border: #e6ddd2;
+      --border-light: #f0ebe3;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.06);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
     }
 
     * {
@@ -75,6 +88,11 @@
       border-radius: 999px;
       border: 1px solid var(--border);
       background: #fff;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav a:hover {
+      background: var(--accent-soft);
     }
 
     .nav a.active {
@@ -87,41 +105,76 @@
       margin-top: 18px;
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: var(--radius-lg);
       padding: 22px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+      box-shadow: var(--shadow-md);
     }
 
+    /* ── Input section ── */
     .intro {
       display: grid;
-      grid-template-columns: minmax(0, 320px) 1fr;
+      grid-template-columns: minmax(0, 400px) 1fr;
       gap: 18px;
       align-items: start;
     }
 
-    .input-card,
-    .info-card {
+    .input-card {
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       background: #fff;
-      padding: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
     }
 
-    label {
-      display: block;
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .input-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       margin-bottom: 6px;
       font-size: 13px;
       color: var(--muted);
+      font-weight: 600;
+    }
+
+    .label-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted-light);
+      background: var(--border-light);
+      padding: 1px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
     }
 
     input {
       width: 100%;
       padding: 12px 14px;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       font-size: 24px;
       font-weight: 600;
       text-align: center;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(154, 52, 18, 0.12);
+    }
+
+    input.lot-input {
+      font-size: 20px;
     }
 
     .hint {
@@ -131,28 +184,44 @@
       line-height: 1.5;
     }
 
+    .info-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-card>strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
     .rule-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
-      margin-top: 10px;
     }
 
     .rule-item {
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       padding: 12px;
       background: #faf7f2;
       border: 1px solid var(--border);
       font-size: 13px;
-      line-height: 1.45;
+      line-height: 1.55;
     }
 
     .rule-item strong {
       display: block;
       margin-bottom: 4px;
-      font-size: 15px;
+      font-size: 14px;
+      color: var(--accent);
     }
 
+    /* ── Board ── */
     .board {
       margin-top: 22px;
       display: grid;
@@ -164,16 +233,17 @@
     .column-title {
       margin: 0;
       font-size: 15px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--muted);
     }
 
     .section-toggle {
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       background: #fff;
       overflow: hidden;
+      box-shadow: var(--shadow-sm);
     }
 
     .section-toggle summary {
@@ -196,101 +266,188 @@
       font-size: 20px;
       line-height: 1;
       color: var(--muted);
+      transition: transform 0.2s;
     }
 
     .section-toggle[open] summary::after {
-      content: "-";
+      content: "\2212";
     }
 
     .section-content {
-      padding: 0 16px 16px;
+      padding: 0 4px 12px;
     }
 
-    .card-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .price-card {
-      border-radius: 16px;
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      background: #fff;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
     }
 
-    .price-card.up {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    thead th:first-child {
+      text-align: left;
+    }
+
+    .ara-table thead th {
+      background: var(--up-head-bg);
+      color: var(--up-head-text);
+    }
+
+    .arb-table thead th {
+      background: var(--down-head-bg);
+      color: var(--down-head-text);
+    }
+
+    tbody td {
+      padding: 10px 12px;
+      text-align: right;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border-light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .ara-table tbody tr:nth-child(even) {
       background: var(--up-soft);
-      border-color: #b9ebe1;
     }
 
-    .price-card.down {
+    .ara-table tbody tr:hover {
+      background: #d5f5ef;
+    }
+
+    .arb-table tbody tr:nth-child(even) {
       background: var(--down-soft);
-      border-color: #f2c9c7;
     }
 
-    .price-card.center {
-      background: linear-gradient(180deg, var(--center-soft), #ffffff);
-      border-color: #c9d7ff;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-      padding: 24px 18px;
+    .arb-table tbody tr:hover {
+      background: #fde8e6;
     }
 
-    .price-meta {
-      display: grid;
-      gap: 4px;
-    }
-
-    .price-meta span,
-    .center-note {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .price-meta strong {
-      font-size: 16px;
-    }
-
-    .level-tag {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 62px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 12px;
+    .gain {
+      color: var(--up);
       font-weight: 700;
-      color: #fff;
     }
 
-    .up .level-tag {
-      background: var(--up);
-    }
-
-    .down .level-tag {
-      background: var(--down);
-    }
-
-    .center-price {
-      font-size: 36px;
+    .loss {
+      color: var(--down);
       font-weight: 700;
-      color: var(--center);
-      line-height: 1.1;
-      margin: 8px 0;
+    }
+
+    .col-level {
+      min-width: 70px;
+    }
+    .col-pct {
+      min-width: 60px;
+    }
+    .col-price {
+      min-width: 90px;
+    }
+    .col-diff {
+      min-width: 120px;
+    }
+    .col-nom {
+      min-width: 110px;
+    }
+    .col-total-val {
+      min-width: 110px;
+    }
+    .col-total-diff {
+      min-width: 130px;
+    }
+    .col-tick {
+      min-width: 60px;
     }
 
     .empty {
       border: 1px dashed var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       padding: 24px;
       text-align: center;
       color: var(--muted);
       background: #fcfbf8;
+      font-size: 14px;
+    }
+
+    /* ── Center summary card ── */
+    .price-card.center {
+      border-radius: var(--radius-md);
+      border: 1px solid #c9d7ff;
+      background: linear-gradient(180deg, var(--center-soft), #ffffff);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: 22px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .center-note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .center-price {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--center);
+      line-height: 1.1;
+      margin: 6px 0;
+    }
+
+    .center-meta {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .center-nominal {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(29, 78, 216, 0.12);
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .center-nominal-item {
+      text-align: center;
+    }
+
+    .center-nominal-item .cn-label {
+      font-size: 11px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .center-nominal-item .cn-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--center);
     }
 
     footer {
@@ -300,6 +457,7 @@
       text-align: center;
     }
 
+    /* ── Responsive ── */
     @media (max-width: 920px) {
       .intro {
         grid-template-columns: 1fr;
@@ -307,6 +465,38 @@
 
       .rule-grid {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .wrap {
+        padding: 0 12px;
+        margin: 20px auto 40px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      thead th {
+        padding: 8px 8px;
+        font-size: 11px;
+      }
+
+      tbody td {
+        padding: 8px 8px;
+      }
+
+      .center-price {
+        font-size: 32px;
       }
     }
   </style>
@@ -329,24 +519,36 @@
     <div class="panel">
       <section class="intro">
         <div class="input-card">
-          <label for="currentPrice">Current price</label>
-          <input id="currentPrice" type="text" inputmode="numeric" placeholder=" 1.250" />
-          <div class="hint">
-            Perhitungan otomatis.
-            Asumsi untuk saham papan utama, new economy, dan pengembangan.
+          <div class="input-group">
+            <label for="currentPrice">Harga saat ini (current price)</label>
+            <input id="currentPrice" type="text" inputmode="numeric" placeholder=" 1.250" />
+            <div class="hint">
+              Perhitungan otomatis. Berlaku untuk saham papan utama, new economy, dan pengembangan.
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="lotCount">
+              Jumlah lot
+              <span class="label-badge">opsional</span>
+            </label>
+            <input id="lotCount" class="lot-input" type="text" inputmode="numeric" placeholder=" Misal: 10" />
+            <div class="hint">
+              Kosongkan jika hanya ingin melihat nilai per lot (1 lot = 100 lembar).
+            </div>
           </div>
         </div>
 
         <div class="info-card">
-          <strong>Rule yang dipakai</strong>
+          <strong>Aturan batasan ARA / ARB</strong>
           <div class="rule-grid">
             <div class="rule-item">
-              <strong>Rp50 - Rp200</strong>
+              <strong>Rp50 – Rp200</strong>
               ARA 35%<br />
               ARB 15%
             </div>
             <div class="rule-item">
-              <strong>&gt;Rp200 - Rp5.000</strong>
+              <strong>&gt;Rp200 – Rp5.000</strong>
               ARA 25%<br />
               ARB 15%
             </div>
@@ -357,7 +559,7 @@
             </div>
           </div>
           <div class="hint">
-            Pembulatan harga mengikuti tick size BEI. Halaman ini tidak menghitung aturan khusus watchlist,
+            Pembulatan harga mengikuti tick size BEI. Tidak termasuk aturan khusus untuk watchlist,
             acceleration board, IPO hari pertama, warrant, ETF, atau DINFRA.
           </div>
         </div>
@@ -366,28 +568,28 @@
       <section class="board">
         <details class="section-toggle" open>
           <summary>
-            <h2 class="column-title">ARA 1 - 10</h2>
+            <h2 class="column-title">ARA 1 – 10</h2>
           </summary>
           <div class="section-content">
-            <div class="card-list" id="araList">
-              <div class="empty">Isi current price untuk menampilkan level ARA.</div>
+            <div class="table-wrap" id="araWrap">
+              <div class="empty">Masukkan current price untuk melihat level ARA.</div>
             </div>
           </div>
         </details>
 
         <div class="price-card center" id="centerCard">
-          <div class="center-note">Current Price</div>
+          <div class="center-note">Harga Saat Ini</div>
           <div class="center-price">-</div>
-          <div class="center-note">Menunggu input harga</div>
+          <div class="center-meta">Menunggu input harga</div>
         </div>
 
         <details class="section-toggle" open>
           <summary>
-            <h2 class="column-title">ARB 1 - 10</h2>
+            <h2 class="column-title">ARB 1 – 10</h2>
           </summary>
           <div class="section-content">
-            <div class="card-list" id="arbList">
-              <div class="empty">Isi current price untuk menampilkan level ARB.</div>
+            <div class="table-wrap" id="arbWrap">
+              <div class="empty">Masukkan current price untuk melihat level ARB.</div>
             </div>
           </div>
         </details>
