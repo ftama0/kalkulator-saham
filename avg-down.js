@@ -61,6 +61,12 @@ const formatPrice = (value) =>
     maximumFractionDigits: 4,
   }).format(value);
 
+const formatIDRDecimal = (value) =>
+  `Rp${new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)}`;
+
 const formatPriceInput = (value) => (value ? formatPrice(value) : "");
 
 const formatNumber = (value) =>
@@ -169,6 +175,74 @@ const renderResult = (data) => {
   `;
 };
 
+const calcSimulation = () => {
+  const initialLot = readNumber("simInitialLot");
+  const initialAvg = readPrice("simInitialAvg");
+  const addPrice = readPrice("simAddPrice");
+  const addLot = readNumber("simAddLot");
+
+  const initialShares = initialLot * 100;
+  const addShares = addLot * 100;
+
+  const initialCost = initialAvg * initialShares;
+  const addCost = addPrice * addShares;
+
+  const totalCost = initialCost + addCost;
+  const totalShares = initialShares + addShares;
+  const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
+
+  return {
+    initialLot,
+    initialAvg,
+    addPrice,
+    addLot,
+    initialShares,
+    addShares,
+    initialCost,
+    addCost,
+    totalCost,
+    totalShares,
+    totalLot: totalShares / 100,
+    avgPrice,
+  };
+};
+
+const renderSimulation = (data) => {
+  const resultBox = el("simResultBox");
+  resultBox.classList.remove("empty");
+  if (!data.totalShares || !data.totalCost) {
+    resultBox.classList.add("empty");
+    resultBox.innerHTML = `
+      <div class="result-title">Hasil simulasi</div>
+      <div>Isi data lalu hasil simulasi akan otomatis muncul.</div>
+    `;
+    return;
+  }
+  resultBox.innerHTML = `
+    <div class="result-title">Hasil simulasi</div>
+    <div class="result-grid">
+      <div class="result-row">
+        <span>Average baru</span>
+        <strong>${formatIDRDecimal(data.avgPrice)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Total lot</span>
+        <strong>${formatNumber(data.totalLot)}</strong>
+      </div>
+    </div>
+    <div class="result-grid" style="margin-top: 5%;">
+      <div class="result-row">
+        <span>Modal tambahan</span>
+        <strong>${formatIDR(data.addCost)}</strong>
+      </div>
+      <div class="result-row">
+        <span>Total modal</span>
+        <strong>${formatIDR(data.totalCost)}</strong>
+      </div>
+    </div>
+  `;
+};
+
 const setupPriceInput = (id) => {
   const input = el(id);
   input.addEventListener("focus", () => {
@@ -206,6 +280,49 @@ const autoFillCost = (priceId, lotId, feeId) => {
   } else {
     feeInput.value = "";
   }
+};
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const paintSlider = (slider) => {
+  const min = Number(slider.min) || 0;
+  const max = Number(slider.max) || 0;
+  const value = Number(slider.value) || 0;
+  const pct = max > min ? ((value - min) / (max - min)) * 100 : 0;
+  slider.style.background = `linear-gradient(90deg, var(--accent) ${pct}%, #e6e1d8 ${pct}%)`;
+};
+
+const syncSliderFromInput = (inputId, sliderId) => {
+  const input = el(inputId);
+  const slider = el(sliderId);
+  if (!input || !slider) return;
+
+  const step = Number(slider.step) || 1;
+  const min = Number(slider.min) || 0;
+  const value = Math.round(parsePriceInput(input.value) / step) * step;
+
+  if (value > Number(slider.max)) {
+    slider.max = String(Math.ceil(value / step) * step);
+  }
+  slider.value = String(clamp(value, min, Number(slider.max)));
+  paintSlider(slider);
+};
+
+const setupSimSlider = (inputId, sliderId) => {
+  const input = el(inputId);
+  const slider = el(sliderId);
+  if (!input || !slider) return;
+
+  slider.addEventListener("input", () => {
+    input.value = slider.value;
+    paintSlider(slider);
+    renderSimulation(calcSimulation());
+  });
+
+  const syncFromField = () => syncSliderFromInput(inputId, sliderId);
+  input.addEventListener("input", syncFromField);
+  input.addEventListener("blur", syncFromField);
+  syncFromField();
 };
 
 const loadHistory = () => {
@@ -318,6 +435,7 @@ const setTab = (name) => {
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
   el("tab-calc").style.display = name === "calc" ? "block" : "none";
+  el("tab-sim").style.display = name === "sim" ? "block" : "none";
   el("tab-history").style.display = name === "history" ? "block" : "none";
 };
 
@@ -379,7 +497,23 @@ const init = () => {
   });
 
   el("copyHistoryBtn").addEventListener("click", copyHistory);
+
+  setupPriceInput("simInitialAvg");
+  setupPriceInput("simAddPrice");
+
+  const simInputs = ["simInitialLot", "simInitialAvg", "simAddPrice", "simAddLot"];
+  simInputs.forEach((id) => {
+    el(id).addEventListener("input", () => renderSimulation(calcSimulation()));
+    el(id).addEventListener("blur", () => renderSimulation(calcSimulation()));
+  });
+
+  setupSimSlider("simInitialLot", "simInitialLotRange");
+  setupSimSlider("simInitialAvg", "simInitialAvgRange");
+  setupSimSlider("simAddPrice", "simAddPriceRange");
+  setupSimSlider("simAddLot", "simAddLotRange");
+
   renderResult(calcAverageDown());
+  renderSimulation(calcSimulation());
 };
 
 init();
