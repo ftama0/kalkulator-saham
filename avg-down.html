@@ -346,6 +346,7 @@
       <div class="tabs-row">
         <div class="tabs" role="tablist">
           <button class="tab active" data-tab="calc" type="button">Kalkulator</button>
+          <button class="tab" data-tab="sim" type="button">Simulasi</button>
           <button class="tab" data-tab="history" type="button">History</button>
         </div>
         <button class="btn secondary" id="addHistoryBtn" type="button">Simpan ke History</button>
@@ -397,6 +398,34 @@
         </div>
 
         <div class="result" id="resultBox">Isi data lalu perhitungan akan otomatis muncul.</div>
+      </section>
+
+      <section id="tab-sim" class="tab-panel" style="display:none;">
+        <div class="section-title"><strong>Simulasi avg down</strong></div>
+        <div class="grid">
+          <div>
+            <label for="simInitialLot">Lot awal</label>
+            <input id="simInitialLot" type="number" min="0" step="1" placeholder="97" />
+          </div>
+          <div>
+            <label for="simInitialAvg">Average awal (Rp)</label>
+            <input id="simInitialAvg" type="text" inputmode="decimal" placeholder="265" />
+          </div>
+          <div>
+            <label for="simAddPrice">Harga beli tambahan (Rp)</label>
+            <input id="simAddPrice" type="text" inputmode="decimal" placeholder="230" />
+          </div>
+          <div>
+            <label for="simAddLot">Lot tambahan</label>
+            <input id="simAddLot" type="number" min="0" step="1" placeholder="112" />
+          </div>
+        </div>
+
+        <div class="result empty" id="simResultBox">Isi data lalu hasil simulasi akan otomatis muncul.</div>
+
+        <div class="muted" style="margin-top: 10px; font-size: 12px;">
+          Belum termasuk biaya transaksi. Perhitungan mengasumsikan 1 lot = 100 lembar.
+        </div>
       </section>
 
       <section id="tab-history" class="tab-panel" style="display:none;">
