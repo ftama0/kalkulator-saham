@@ -282,6 +282,49 @@ const autoFillCost = (priceId, lotId, feeId) => {
   }
 };
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const paintSlider = (slider) => {
+  const min = Number(slider.min) || 0;
+  const max = Number(slider.max) || 0;
+  const value = Number(slider.value) || 0;
+  const pct = max > min ? ((value - min) / (max - min)) * 100 : 0;
+  slider.style.background = `linear-gradient(90deg, var(--accent) ${pct}%, #e6e1d8 ${pct}%)`;
+};
+
+const syncSliderFromInput = (inputId, sliderId) => {
+  const input = el(inputId);
+  const slider = el(sliderId);
+  if (!input || !slider) return;
+
+  const step = Number(slider.step) || 1;
+  const min = Number(slider.min) || 0;
+  const value = Math.round(parsePriceInput(input.value) / step) * step;
+
+  if (value > Number(slider.max)) {
+    slider.max = String(Math.ceil(value / step) * step);
+  }
+  slider.value = String(clamp(value, min, Number(slider.max)));
+  paintSlider(slider);
+};
+
+const setupSimSlider = (inputId, sliderId) => {
+  const input = el(inputId);
+  const slider = el(sliderId);
+  if (!input || !slider) return;
+
+  slider.addEventListener("input", () => {
+    input.value = slider.value;
+    paintSlider(slider);
+    renderSimulation(calcSimulation());
+  });
+
+  const syncFromField = () => syncSliderFromInput(inputId, sliderId);
+  input.addEventListener("input", syncFromField);
+  input.addEventListener("blur", syncFromField);
+  syncFromField();
+};
+
 const loadHistory = () => {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -463,6 +506,11 @@ const init = () => {
     el(id).addEventListener("input", () => renderSimulation(calcSimulation()));
     el(id).addEventListener("blur", () => renderSimulation(calcSimulation()));
   });
+
+  setupSimSlider("simInitialLot", "simInitialLotRange");
+  setupSimSlider("simInitialAvg", "simInitialAvgRange");
+  setupSimSlider("simAddPrice", "simAddPriceRange");
+  setupSimSlider("simAddLot", "simAddLotRange");
 
   renderResult(calcAverageDown());
   renderSimulation(calcSimulation());
